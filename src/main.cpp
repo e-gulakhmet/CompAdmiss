@@ -5,6 +5,7 @@
 #include <main.h>
 #include <Encoder.h>
 #include <LcdDisplay.h>
+#include <parsing.h>
 
 SoftwareSerial mySerial(TX_PIN, RX_PIN);
 GRGB leds(RED_PIN, GREEN_PIN, BLUE_PIN);  // куда подключены цвета (R, G, B)
@@ -31,6 +32,8 @@ void loop() {
   if(encLeft()){
     Serial.println("enc_left");
   }
-
-  leds.setHEX(LIME);
+  
+  parsing();
+  lcd.setCursor(0,0);
+  lcd.print(PCdata[0]);
 }

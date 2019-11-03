@@ -11,3 +11,5 @@
 #define ENC_B 3    // пин энкодера
 #define ENC_TYPE 1    // тип энкодера, 0 или 1
 #define BUTT_PIN 7
+
+#define TIMEOUT 5000
