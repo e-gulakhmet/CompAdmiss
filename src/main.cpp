@@ -6,9 +6,27 @@
 #include <Encoder.h>
 #include <LcdDisplay.h>
 #include <parsing.h>
+#include <Button.h>
 
 SoftwareSerial mySerial(TX_PIN, RX_PIN);
 GRGB leds(RED_PIN, GREEN_PIN, BLUE_PIN);  // куда подключены цвета (R, G, B)
+
+int main_mode;
+
+
+
+void calmMode(){
+  showInfo("Easy", PCdata[0], 0, 100);
+}
+
+
+
+void mainMenu(){ // Главное меню
+  switch(main_mode){
+    case 0: calmMode(); break; 
+  }
+}
+
 
 
 
@@ -19,21 +37,22 @@ void setup() {
   setupEnc();
 
   setupLcdDisp();
+  createChar();
+
   leds.setBrightness(100);
+
+  printLogo();
+  delay(2000);
+  lcd.clear();
 }
 
 
 
 void loop() {
-
-  if(encRight()){
-    Serial.println("enc_right");
-  }
-  if(encLeft()){
-    Serial.println("enc_left");
-  }
-  
   parsing();
-  lcd.setCursor(0,0);
-  lcd.print(PCdata[0]);
+  button.tick();
+
+  mainMenu();
+
 }
+

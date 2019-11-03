@@ -1,5 +1,4 @@
 #include <Arduino.h>
-#include <main.h>
 
 volatile int encCounter;
 int enc_counter_old;

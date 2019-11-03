@@ -1,15 +1,14 @@
 #include <Arduino.h>
+const int GREEN_PIN = 5; // Зеленый пин ленты
+const int RED_PIN = 6;   // Зеленый пин ленты
+const int BLUE_PIN = 9;  // Зеленый пин ленты
 
-#define GREEN_PIN 5
-#define RED_PIN 6
-#define BLUE_PIN 9
+const int TX_PIN = 11;
+const int RX_PIN = 12;
 
-#define TX_PIN 11
-#define RX_PIN 12
+const int ENC_A = 2;     // пин энкодера
+const int ENC_B = 3;     // пин энкодера
+const int ENC_TYPE = 1;  // тип энкодера, 0 или 1
+const int BUTT_PIN = 7;  // пин кнопки
 
-#define ENC_A 2      // пин энкодера
-#define ENC_B 3    // пин энкодера
-#define ENC_TYPE 1    // тип энкодера, 0 или 1
-#define BUTT_PIN 7
-
-#define TIMEOUT 5000
+const int TIMEOUT = 5000; // Время после которого перестаем подключаться к компьютеру
