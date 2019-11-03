@@ -15,8 +15,8 @@ int main_mode;
 
 
 
-void calmMode(){
-  showInfo("Easy", PCdata[0], 0, 100);
+void calmMode(){ // Спокойный режим
+  showInfo("Easy", PCdata[0], 0, 100); // Информация
 }
 
 
