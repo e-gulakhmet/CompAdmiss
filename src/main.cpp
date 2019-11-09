@@ -1,31 +1,12 @@
 #include <Arduino.h>
 #include <SoftwareSerial.h>
-#include <GyverRGB.h>
 
-#include <main.h>
+
+#include <menu.h>
 #include <Encoder.h>
-#include <LcdDisplay.h>
-#include <parsing.h>
 #include <Button.h>
 
 SoftwareSerial mySerial(TX_PIN, RX_PIN);
-GRGB leds(RED_PIN, GREEN_PIN, BLUE_PIN);  // куда подключены цвета (R, G, B)
-
-int main_mode;
-
-
-
-void calmMode(){ // Спокойный режим
-  showInfo("Easy", PCdata[0], 0, 100); // Информация
-}
-
-
-
-void mainMenu(){ // Главное меню
-  switch(main_mode){
-    case 0: calmMode(); break; 
-  }
-}
 
 
 
@@ -33,13 +14,14 @@ void mainMenu(){ // Главное меню
 void setup() {
   Serial.begin(9600);
   mySerial.begin(9600);
+  pinMode(FAN_PIN, OUTPUT);
 
   setupEnc();
 
   setupLcdDisp();
   createChar();
 
-  leds.setBrightness(100);
+  leds.setBrightness(BRIGHT);
 
   printLogo();
   delay(2000);
@@ -53,6 +35,5 @@ void loop() {
   button.tick();
 
   mainMenu();
-
 }
 
