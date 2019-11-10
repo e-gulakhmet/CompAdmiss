@@ -3,16 +3,19 @@
 #include <GyverRGB.h>
 #include <OneButton.h>
 #include <Wire.h>
+#include <LiquidCrystal_I2C.h>
 #include <GyverEncoder.h>
 
+
 #include <main.h>
-#include <Encoder.h>
-#include <parsing.h>
+#include <fan.h>
 
 
 SoftwareSerial mySerial(TX_PIN, RX_PIN);
 GRGB leds(RED_PIN, GREEN_PIN, BLUE_PIN);
 Encoder enc(ENC_A, ENC_B, BUTT_PIN, 1);
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+Fan fan(FAN_PIN);
 
 
 
@@ -24,7 +27,6 @@ char inData[82];       // массив входных значений (СИМВ
 int PCdata[20];        // массив численных значений показаний с компьютера
 byte index = 0;
 String string_convert;
-
 
 
 
@@ -63,6 +65,8 @@ void setup() {
   mySerial.begin(9600);
   pinMode(FAN_PIN, OUTPUT);
 
+  lcd.begin();
+  lcd.backlight();
   
   leds.setBrightness(BRIGHT);
 
@@ -74,6 +78,7 @@ void setup() {
 void loop() {
   parsing();
   enc.tick();
+  fan.tick();
 
   if (enc.isRight()) Serial.println("Right");         // если был поворот
   if (enc.isLeft()) Serial.println("Left");
