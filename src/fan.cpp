@@ -1,8 +1,11 @@
 #include <fan.h>
 
+
+
 Fan::Fan(uint8_t fan_pin)
     : fan_pin_(fan_pin)
     , flag_check(false)
+    , f_mode(calmM)
     {
         pinMode(fan_pin_, OUTPUT);
     }
@@ -10,7 +13,7 @@ Fan::Fan(uint8_t fan_pin)
 
 
 void Fan::tick(){ 
-  if(!flag_check && millis() - fan_timer > 5000){
+  if(!flag_check && millis() - fan_timer > 5000){ // Проверяем данные по температуре каждые n секунд
     flag_check = true;
   }
 
@@ -42,4 +45,27 @@ void Fan::tick(){
     gpu_temp = PC_temp[1];
     Serial.println(cpu_temp);
   }
+
+  if(flag_online){ // Если флаг работы вентилятора активен
+    analogWrite(fan_pin_, fan_speed); // Вентилятор работает
+  }
+  else if(!flag_online){ // Если флаг работы вентилятора не активен
+    analogWrite(fan_pin_, 0); // Вентилятор не работает
+  }
+
+
+  // Автоматической переключение между режимами
+  // Проверяем, если температура высокая, то увеличиваем скорость
+  if(cpu_temp > def_value[calmM].max_temp){
+    fan_speed = def_value[normalM].speed;
+  }
+  if(cpu_temp < def_value[calmM].max_temp){
+    fan_speed = def_value[calmM].speed;
+  }
+  
+
+
+
+
+
 }
