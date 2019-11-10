@@ -11,6 +11,8 @@ class Fan{
         void On();
         void Off();
         void setSpeed();
+        uint8_t getTempCPU() {return cpu_temp;}
+        uint8_t getTempGPU() {return gpu_temp;}
     
     private:
         uint8_t fan_pin_;
@@ -29,7 +31,7 @@ class Fan{
 
         unsigned long fan_timer;
 
-        void get_temp();
+
 };
 
 
