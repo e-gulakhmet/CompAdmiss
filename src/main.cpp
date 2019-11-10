@@ -1,13 +1,16 @@
 #include <Arduino.h>
 #include <SoftwareSerial.h>
+#include <GyverRGB.h>
+#include <OneButton.h>
 
-
-#include <menu.h>
+#include <main.h>
 #include <Encoder.h>
 #include <Button.h>
+#include <parsing.h>
+#include <display.h>
 
 SoftwareSerial mySerial(TX_PIN, RX_PIN);
-
+GRGB leds(RED_PIN, GREEN_PIN, BLUE_PIN);  // куда подключены цвета (R, G, B)
 
 
 
@@ -17,15 +20,10 @@ void setup() {
   pinMode(FAN_PIN, OUTPUT);
 
   setupEnc();
-
-  setupLcdDisp();
-  createChar();
-
+  
   leds.setBrightness(BRIGHT);
 
-  printLogo();
   delay(2000);
-  lcd.clear();
 }
 
 
@@ -33,7 +31,5 @@ void setup() {
 void loop() {
   parsing();
   button.tick();
-
-  mainMenu();
 }
 

@@ -8,16 +8,16 @@ volatile boolean state0, lastState, turnFlag;
 
 void int0() {
 state0 = bitRead(PIND, ENC_A);
-if (state0 != lastState) {
-#if (ENC_TYPE == 1)
-turnFlag = !turnFlag;
-if (turnFlag)
-encCounter += (bitRead(PIND, ENC_B) != lastState) ? -1 : 1;
-#else
-encCounter += (bitRead(PIND, ENC_B) != lastState) ? -1 : 1;
-#endif
-lastState = state0;
-}
+    if (state0 != lastState) {
+        #if (ENC_TYPE == 1)
+        turnFlag = !turnFlag;
+            if (turnFlag)
+            encCounter += (bitRead(PIND, ENC_B) != lastState) ? -1 : 1;
+        #else
+        encCounter += (bitRead(PIND, ENC_B) != lastState) ? -1 : 1;
+        #endif
+    lastState = state0;
+    }
 }
 
 

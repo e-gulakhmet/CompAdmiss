@@ -2,6 +2,15 @@
 
 
 
+
+class Parsing{
+  public:
+    Parsing();
+}
+
+
+
+
 // парсинг
 boolean onlineFlag;
 uint32_t timeoutTimer;
