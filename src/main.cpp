@@ -17,24 +17,46 @@ Encoder enc(ENC_A, ENC_B, BUTT_PIN, 1);
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 Fan fan(FAN_PIN);
 
+typedef struct {
+  uint8_t cpu_temp;
+  uint8_t gpu_temp;
+  uint8_t mb_temp;
+  uint8_t hdd_temp;
+  uint8_t cpu_load;
+  uint8_t gpu_load;
+  uint8_t ram_use;
+  uint8_t gpu_mem_use;
+  uint8_t fan_max;
+  uint8_t fan_min;
+  uint8_t temp_max;
+  uint8_t temp_min;
+  uint8_t fan_manual;
+  uint8_t color_manual;
+  uint8_t fan_ctrl;
+  uint8_t color_ctrl; 
+  uint8_t bright_ctrl;
+} OHMInfo;
 
+typedef union {
+  OHMInfo info;
+  byte data[16];
+} PCInfo;
 
+PCInfo info;
+
+unsigned long timer_info;
 
 // парсинг
 boolean onlineFlag;
 uint32_t timeoutTimer;
 char inData[82];       // массив входных значений (СИМВОЛЫ)
-int PCdata[20];        // массив численных значений показаний с компьютера
+
 byte index = 0;
 String string_convert;
 
 
 
-void parsing() {
-  if (onlineFlag && millis() - timeoutTimer > TIMEOUT) {
-    onlineFlag = false;
-  }
-  
+void parse(PCInfo *info){
   while (Serial.available() > 0) {
     char aChar = Serial.read();
     if (aChar != 'E') {
@@ -48,7 +70,7 @@ void parsing() {
       String value = "";
       while ((str = strtok_r(p, ";", &p)) != NULL) {
         string_convert = str;
-        PCdata[index] = string_convert.toInt();
+        info->data[index] = string_convert.toInt();
         index++;
       }
       index = 0;
@@ -56,6 +78,13 @@ void parsing() {
       onlineFlag = true;
     }
   }
+}
+
+
+
+void show_info(PCInfo *info){
+  lcd.setCursor(0,0);
+  lcd.print(info->info.cpu_temp);
 }
 
 
@@ -76,15 +105,25 @@ void setup() {
 
 
 void loop() {
-  parsing();
+  if(millis() - timer_info > 5000){
+    parse(&info);
+    timer_info = millis();
+  }
+
+  //Serial.print("cpu+temp = "); Serial.println(info.info.cpu_temp);
+
+  
+
   enc.tick();
-  fan.tick();
+  //fan.tick();
 
   if (enc.isRight()) Serial.println("Right");         // если был поворот
   if (enc.isLeft()) Serial.println("Left");
   
   if (enc.isRightH()) Serial.println("Right holded"); // если было удержание + поворот
   if (enc.isLeftH()) Serial.println("Left holded");
+
+  show_info(&info);
 }
 
 
