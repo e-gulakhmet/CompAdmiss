@@ -13,7 +13,7 @@
 
 SoftwareSerial mySerial(TX_PIN, RX_PIN);
 GRGB leds(RED_PIN, GREEN_PIN, BLUE_PIN);
-Encoder enc(ENC_A, ENC_B, BUTT_PIN, 1);
+Encoder enc(ENC_A, ENC_B, BUTT_PIN);
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 Fan fan(FAN_PIN);
 
@@ -107,7 +107,7 @@ void setup() {
   
   leds.setBrightness(BRIGHT);
 
-  delay(2000);
+  enc.setType(TYPE1);    // тип энкодера TYPE1 одношаговый, TYPE2 двухшаговый. Если ваш энкодер работает странно, смените тип
 }
 
 
@@ -118,18 +118,14 @@ void loop() {
     timer_info = millis();
   }
   
-
   enc.tick();
-
-  if (enc.isRight()) fan.on();         // если был поворот
-  if (enc.isLeft()) fan.off();
-
-  if(enc.isPress()) fan.auto_mode();
   
+  if (enc.isRight()) Serial.println("Right");         // если был поворот
+  if (enc.isLeft()) Serial.println("Left");
   if (enc.isRightH()) Serial.println("Right holded"); // если было удержание + поворот
   if (enc.isLeftH()) Serial.println("Left holded");
 
-  show_info(&info);
+  //show_info(&info);
 }
 
 
