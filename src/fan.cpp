@@ -4,61 +4,32 @@
 
 Fan::Fan(uint8_t fan_pin)
     : fan_pin_(fan_pin)
-    , f_mode_(fmCalm)
+    , fan_mode_(fmOff)
     {
         pinMode(fan_pin_, OUTPUT);
-        fan_speed_ = def_value[fmCalm].speed;
+        fan_speed_ = 0;
     }
 
 
-void Fan::tick(uint8_t c_temp, uint8_t g_temp){
+void Fan::tick(uint8_t cpu_temp, uint8_t gpu_temp){
+    // Измеряем температуру, каждые n секунд.
+    if(millis() - fan_timer_ > 5000){
+        fan_timer_ = millis();
+        cpu_temp_ = cpu_temp;
+        gpu_temp_ = gpu_temp;
+        // Выбираем режим
+        if(cpu_temp_ > def_cpu_value[fmOff].max_temp
+        || gpu_temp_ > def_gpu_value[fmOff].max_temp){
+            fan_mode_ = fmPower;
+        }
+        else if(cpu_temp_ < def_cpu_value[fmPower].min_temp
+                || gpu_temp_ < def_gpu_value[fmPower].min_temp){
+            fan_mode_ = fmOff;
+        }
+    }
 
+    // Присваем дэфолтные значения выбранного режима, скорости вентилятора(fan_speed_)
+    fan_speed_ = def_cpu_value[fan_mode_].speed;
+
+    analogWrite(fan_pin_, fan_speed_);
 }
-
-// void Fan::tick(uint8_t c_temp, uint8_t g_temp){ 
-
-//   if(millis() - fan_timer_ > 5000) // Проверяем данные по температуре каждые n секунд
-//     return;    
-
-//   while (Serial.available() > 0) {
-//     char aChar = Serial.read();
-//     if (aChar != 'E'){
-//       inData[index] = aChar;
-//       index++;
-//       inData[index] = '\0';
-//     }
-//     else{
-//       char *p = inData;
-//       char *str;
-//       index = 0;
-//       String value = "";
-//       while ((str = strtok_r(p, ";", &p)) != NULL) {
-//         string_convert = str;
-//         PC_temp[index] = string_convert.toInt();
-//         index++;
-//       }
-//       index = 0;
-//     }
-//   }
-//   fan_timer_ = millis(); 
-//   cpu_temp = PC_temp[0];
-//   gpu_temp = PC_temp[1];
-//   Serial.println(cpu_temp);
-
-//   if(flag_online){ // Если флаг работы вентилятора активен
-//     analogWrite(fan_pin_, fan_speed); // Вентилятор работает
-//   }
-//   else if(!flag_online){ // Если флаг работы вентилятора не активен
-//     analogWrite(fan_pin_, 0); // Вентилятор не работает
-//   }
-
-
-//   // Автоматической переключение между режимами
-//   // Проверяем, если температура высокая, то увеличиваем скорость
-//   if(cpu_temp > def_value[calmM].max_temp){
-//     fan_speed = def_value[normalM].speed;
-//   }
-//   if(cpu_temp < def_value[calmM].max_temp){
-//     fan_speed = def_value[calmM].speed;
-//   }
-// }

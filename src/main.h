@@ -3,7 +3,7 @@ const uint8_t GREEN_PIN = 5; // Зеленый пин ленты
 const uint8_t RED_PIN = 6;   // Зеленый пин ленты
 const uint8_t BLUE_PIN = 9;  // Зеленый пин ленты
 
-const uint8_t FAN_PIN = 9;  // Пин вентилятора
+const uint8_t FAN_PIN = 10;  // Пин вентилятора
 
 const uint8_t TX_PIN = 11;
 const uint8_t RX_PIN = 12;

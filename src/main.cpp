@@ -84,7 +84,15 @@ void parse(PCInfo *info){
 
 void show_info(PCInfo *info){
   lcd.setCursor(0,0);
+  lcd.print("CPU Temp:");
   lcd.print(info->info.cpu_temp);
+  lcd.setCursor(0,1);
+  lcd.print("GPU Temp:");
+  lcd.print(info->info.gpu_temp);
+
+
+  fan.tick(info->info.cpu_temp, info->info.gpu_temp);
+  
 }
 
 
