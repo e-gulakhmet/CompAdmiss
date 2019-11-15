@@ -15,7 +15,7 @@
 
 typedef enum { // Перечисление всех режимов
     fmOff,
-    fmPower
+    fmOn
 } FanMode;         
 
 typedef struct {
@@ -32,7 +32,9 @@ const DefValue def_cpu_value[] = { // Значения по умолчанию
 const DefValue def_gpu_value[] = { // Значения по умолчанию
                             {0,0,45},
                             {255,46,150},
-                            };                        
+                            };
+
+// TODO: Добавить константы                            
 
 class Fan {
     public:
@@ -40,8 +42,11 @@ class Fan {
 
         void tick(uint8_t cpu_temp, uint8_t gpu_temp);
         void on();
+        void auto_mode();
         void off();
         void set_speed();
+        FanMode is_mode() {return fan_mode_;}
+        int is_speed() {return fan_speed_;}
     
     private:
         uint8_t fan_pin_;
@@ -51,6 +56,7 @@ class Fan {
         uint8_t gpu_temp_;   // Температура видеокарты
 
         unsigned long fan_timer_;
+        bool is_manual_;
 
         FanMode fan_mode_;
 };

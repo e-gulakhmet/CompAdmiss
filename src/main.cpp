@@ -117,16 +117,14 @@ void loop() {
     parse(&info);
     timer_info = millis();
   }
-
-  //Serial.print("cpu+temp = "); Serial.println(info.info.cpu_temp);
-
   
 
   enc.tick();
-  //fan.tick();
 
-  if (enc.isRight()) Serial.println("Right");         // если был поворот
-  if (enc.isLeft()) Serial.println("Left");
+  if (enc.isRight()) fan.on();         // если был поворот
+  if (enc.isLeft()) fan.off();
+
+  if(enc.isPress()) fan.auto_mode();
   
   if (enc.isRightH()) Serial.println("Right holded"); // если было удержание + поворот
   if (enc.isLeftH()) Serial.println("Left holded");

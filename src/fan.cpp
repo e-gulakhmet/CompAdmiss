@@ -13,18 +13,30 @@ Fan::Fan(uint8_t fan_pin)
 
 void Fan::tick(uint8_t cpu_temp, uint8_t gpu_temp){
     // Измеряем температуру, каждые n секунд.
-    if(millis() - fan_timer_ > 5000){
-        fan_timer_ = millis();
-        cpu_temp_ = cpu_temp;
-        gpu_temp_ = gpu_temp;
-        // Выбираем режим
-        if(cpu_temp_ > def_cpu_value[fmOff].max_temp
-        || gpu_temp_ > def_gpu_value[fmOff].max_temp){
-            fan_mode_ = fmPower;
+    if(!is_manual_){
+        if(millis() - fan_timer_ > 5000){
+            fan_timer_ = millis();
+            cpu_temp_ = cpu_temp;
+            gpu_temp_ = gpu_temp;
+            // Выбираем режим
+            if(cpu_temp_ > def_cpu_value[fmOff].max_temp
+            || gpu_temp_ > def_gpu_value[fmOff].max_temp){
+                fan_mode_ = fmOn;
+            }
+            else if(cpu_temp_ < def_cpu_value[fmOn].min_temp
+                    || gpu_temp_ < def_gpu_value[fmOn].min_temp){
+                fan_mode_ = fmOff;
+            }
         }
-        else if(cpu_temp_ < def_cpu_value[fmPower].min_temp
-                || gpu_temp_ < def_gpu_value[fmPower].min_temp){
-            fan_mode_ = fmOff;
+    }
+
+    else if(is_manual_){ // Если режим ручного управления.
+        // Ecли выбран режим отклчения, то скорость вентиляторов равна 0
+        if(fan_mode_ == fmOff){
+            fan_speed_ = 0;
+        }
+        else if(fan_mode_ == fmOn){
+            fan_speed_ = 255;
         }
     }
 
@@ -32,4 +44,24 @@ void Fan::tick(uint8_t cpu_temp, uint8_t gpu_temp){
     fan_speed_ = def_cpu_value[fan_mode_].speed;
 
     analogWrite(fan_pin_, fan_speed_);
+}
+
+
+
+void Fan::off(){
+    is_manual_ = true;
+    fan_mode_ = fmOff;
+}
+
+
+
+void Fan::on(){
+    is_manual_ = true;
+    fan_mode_ = fmOn;
+}
+
+
+
+void Fan::auto_mode(){
+    is_manual_ = false;
 }
