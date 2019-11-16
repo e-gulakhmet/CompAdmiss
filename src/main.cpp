@@ -6,7 +6,6 @@
 #include <LiquidCrystal_I2C.h>
 #include <GyverEncoder.h>
 
-
 #include <main.h>
 #include <fan.h>
 
@@ -47,10 +46,7 @@ PCInfo info;
 unsigned long timer_info;
 
 // парсинг
-boolean onlineFlag;
-uint32_t timeoutTimer;
 char inData[82];       // массив входных значений (СИМВОЛЫ)
-
 byte index = 0;
 String string_convert;
 
@@ -74,8 +70,6 @@ void parse(PCInfo *info){
         index++;
       }
       index = 0;
-      timeoutTimer = millis();
-      onlineFlag = true;
     }
   }
 }
@@ -84,15 +78,14 @@ void parse(PCInfo *info){
 
 void show_info(PCInfo *info){
   lcd.setCursor(0,0);
-  lcd.print("CPU Temp:");
-  lcd.print(info->info.cpu_temp);
+  lcd.print("Manual");
+  lcd.print(fan.isManual());
   lcd.setCursor(0,1);
-  lcd.print("GPU Temp:");
-  lcd.print(info->info.gpu_temp);
+  lcd.print("Spd");
+  lcd.print(fan.getSpeed());
 
 
   fan.tick(info->info.cpu_temp, info->info.gpu_temp);
-  
 }
 
 
@@ -120,12 +113,12 @@ void loop() {
   
   enc.tick();
   
-  if (enc.isRight()) Serial.println("Right");         // если был поворот
-  if (enc.isLeft()) Serial.println("Left");
-  if (enc.isRightH()) Serial.println("Right holded"); // если было удержание + поворот
+  if (enc.isRight()) fan.on();         // если был поворот
+  if (enc.isLeft()) fan.off();
+  if (enc.isRightH()) fan.autoMode(); // если было удержание + поворот
   if (enc.isLeftH()) Serial.println("Left holded");
 
-  //show_info(&info);
+  show_info(&info);
 }
 
 

@@ -12,33 +12,43 @@ Fan::Fan(uint8_t fan_pin)
 
 
 void Fan::tick(uint8_t cpu_temp, uint8_t gpu_temp){
-    // Измеряем температуру, каждые n секунд.
-    if(!is_manual_){
-        if(millis() - fan_timer_ > 5000){
-            fan_timer_ = millis();
-            cpu_temp_ = cpu_temp;
-            gpu_temp_ = gpu_temp;
-            // Выбираем режим
-            if(cpu_temp_ > def_cpu_value[fmOff].max_temp
-            || gpu_temp_ > def_gpu_value[fmOff].max_temp){
-                fan_mode_ = fmOn;
-            }
-            else if(cpu_temp_ < def_cpu_value[fmOn].min_temp
-                    || gpu_temp_ < def_gpu_value[fmOn].min_temp){
-                fan_mode_ = fmOff;
+    cpu_temp_ = cpu_temp;
+    gpu_temp_ = gpu_temp;
+
+    if(!is_manual_){ // Авто выбор
+        // Проверяем поступают ли данные о температуре
+        // Если температура равна 0, то выключаем флаг is_online_
+        if(cpu_temp_ == 0 && gpu_temp_ == 0){
+            is_online_ = false;
+        }
+        // Если температура не равно 0, то включаем флаг is_online_
+        else if(cpu_temp_ != 0 && gpu_temp_ != 0){
+            is_online_ = true;
+        }
+        
+        // Если флаг не включен, то включаем вентиляторы
+        if(!is_online_){
+            fan_mode_ = fmOn;
+        }
+
+        // Если флаг включен, то происходит выбор режимов и т. д.
+        else if(is_online_){
+            if(millis() - fan_timer_ > 5000){ // Измеряем температуру, каждые n секунд.
+                fan_timer_ = millis();
+                // Выбираем режим
+                if(cpu_temp_ > def_cpu_value[fmOff].max_temp
+                || gpu_temp_ > def_gpu_value[fmOff].max_temp){
+                    fan_mode_ = fmOn;
+                }
+                else if(cpu_temp_ < def_cpu_value[fmOn].min_temp
+                        || gpu_temp_ < def_gpu_value[fmOn].min_temp){
+                    fan_mode_ = fmOff;
+                }
             }
         }
+
     }
 
-    else if(is_manual_){ // Если режим ручного управления.
-        // Ecли выбран режим отклчения, то скорость вентиляторов равна 0
-        if(fan_mode_ == fmOff){
-            fan_speed_ = 0;
-        }
-        else if(fan_mode_ == fmOn){
-            fan_speed_ = 255;
-        }
-    }
 
     // Присваем дэфолтные значения выбранного режима, скорости вентилятора(fan_speed_)
     fan_speed_ = def_cpu_value[fan_mode_].speed;
@@ -62,6 +72,6 @@ void Fan::on(){
 
 
 
-void Fan::auto_mode(){
+void Fan::autoMode(){
     is_manual_ = false;
 }

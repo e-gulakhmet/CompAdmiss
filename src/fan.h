@@ -42,11 +42,12 @@ class Fan {
 
         void tick(uint8_t cpu_temp, uint8_t gpu_temp);
         void on();
-        void auto_mode();
+        void autoMode();
         void off();
-        void set_speed();
-        FanMode is_mode() {return fan_mode_;}
-        int is_speed() {return fan_speed_;}
+        void setSpeed();
+        FanMode getMode() {return fan_mode_;}
+        int getSpeed() {return fan_speed_;}
+        bool isManual() {return is_manual_;}
     
     private:
         uint8_t fan_pin_;
@@ -57,6 +58,7 @@ class Fan {
 
         unsigned long fan_timer_;
         bool is_manual_;
+        bool is_online_;
 
         FanMode fan_mode_;
 };
