@@ -1,6 +1,5 @@
 #include <Arduino.h>
 #include <SoftwareSerial.h>
-#include <GyverRGB.h>
 #include <OneButton.h>
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
@@ -8,13 +7,14 @@
 
 #include <main.h>
 #include <fan.h>
+#include <lights.h>
 
 
 SoftwareSerial mySerial(TX_PIN, RX_PIN);
-GRGB leds(RED_PIN, GREEN_PIN, BLUE_PIN);
 Encoder enc(ENC_A, ENC_B, BUTT_PIN);
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 Fan fan(FAN_PIN);
+Lights leds(RED_PIN, GREEN_PIN, BLUE_PIN);
 
 typedef struct {
   uint8_t cpu_temp;
@@ -78,14 +78,13 @@ void parse(PCInfo *info){
 
 void show_info(PCInfo *info){
   lcd.setCursor(0,0);
-  lcd.print("Manual");
-  lcd.print(fan.isManual());
+  lcd.print("CPU:"); lcd.print(info->info.cpu_temp);
   lcd.setCursor(0,1);
-  lcd.print("Spd");
-  lcd.print(fan.getSpeed());
+  lcd.print("GPU:"); lcd.print(info->info.gpu_temp);
+  lcd.setCursor(10,1);
+  lcd.print("MD:"); lcd.print(leds.getMode());
 
-
-  fan.tick(info->info.cpu_temp, info->info.gpu_temp);
+  leds.tick(info->info.cpu_temp, info->info.gpu_temp);
 }
 
 
@@ -97,10 +96,8 @@ void setup() {
 
   lcd.begin();
   lcd.backlight();
-  
-  leds.setBrightness(BRIGHT);
 
-  enc.setType(TYPE1);    // тип энкодера TYPE1 одношаговый, TYPE2 двухшаговый. Если ваш энкодер работает странно, смените тип
+  enc.setType(TYPE1);
 }
 
 
