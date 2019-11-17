@@ -9,15 +9,29 @@
     При запуске включается выбранный режим подсветки, затем взависимости от режима работы
     цвета становятся более яркими(холодные цвета перестают использоваться).
 
+    Переключение режимов подсветки проиходит, при помощи команд
+    изменяющих режим подсветки(Эти режимы не зависят от температуры).
+
+    Первый и основной режим подсветки - это изменение цвета взависимости от температуры.
+    Второй режим подсветки - это радуга которая при повышении температуры,
+    уходит в красные тона.
+    Третий режим - это измение оттенка красного цвета,
+    при повышении температуры.
 */
 
 typedef enum {
     lmOff = -1,
-    lmCalm,
-    lmNormal,
-    lmPower,
-    lmHell   
+    lmColor, // Переключение цветов
+    lmRainbow, // Радуга
+    lmGamma // Температура
 } LightsMode;
+
+typedef enum {
+    ltmCalm,
+    ltmNormal,
+    ltmPower,
+    ltmHell   
+} LightsTempMode;
 
 typedef struct {
     uint8_t min_temp;
@@ -43,7 +57,14 @@ class Lights {
         Lights(uint8_t red_pin, uint8_t green_pin, uint8_t blue_pin);
 
         void tick(uint8_t cpu_temp, uint8_t gpu_temp);
-        LightsMode getMode() {return lights_mode;}
+        void off();
+        void Color();
+        void Rainbow();
+        void Gamma();
+        void setBrightness();
+
+        LightsTempMode getTempMode();
+        LightsMode getMode();
 
     private:
         uint8_t red_pin_;
@@ -55,12 +76,13 @@ class Lights {
         
         unsigned long lights_timer_;
 
-        GRGB leds;
-        LightsMode lights_mode;
+        GRGB leds_;
+        LightsMode lights_mode_; // Основные режимы работы подсветки
+        LightsTempMode lights_temp_mode_; // Температурные режимы
+
+        uint8_t hsvColor_;
+        unsigned long rainbow_timer_;
 };
-
-
-
 
 
 #endif

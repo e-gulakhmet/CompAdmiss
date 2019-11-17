@@ -5,9 +5,10 @@ Lights::Lights(uint8_t red_pin, uint8_t green_pin, uint8_t blue_pin)
     : red_pin_(red_pin)
     , green_pin_(green_pin)
     , blue_pin_(blue_pin)
-    , leds(red_pin_, green_pin_, blue_pin_)
+    , leds_(red_pin_, green_pin_, blue_pin_)
+    , lights_mode_(lmGamma)
     {
-        leds.setBrightness(50);
+        leds_.setBrightness(50);
     }
 
 
@@ -18,50 +19,79 @@ void Lights::tick(uint8_t cpu_temp, uint8_t gpu_temp){
     // Автоматический выбор режима
     if(millis() - lights_timer_ > 5000){
         lights_timer_ = millis();
-        switch(lights_mode){
-            case lmOff: break;
-
-            case lmCalm: // Если в спокойном режиме
+        switch(lights_temp_mode_){
+            case ltmCalm: // Если в спокойном режиме
                 // Если температура больше максимального  значения, то включаем средний режим
-                if(cpu_temp_ >= def_light_cpu_value[lmCalm].max_temp || gpu_temp_ >= def_light_gpu_value[lmCalm].max_temp){ 
-                    lights_mode = lmNormal;
+                if(cpu_temp_ >= def_light_cpu_value[ltmCalm].max_temp || gpu_temp_ >= def_light_gpu_value[ltmCalm].max_temp){ 
+                    lights_temp_mode_ = ltmNormal;
                 }
                 break;
 
-            case lmNormal: // Если в среднем режиме
+            case ltmNormal: // Если в среднем режиме
                 // Если температура ниже минимального значения, то включаем спкойный режим
-                if(cpu_temp_ <= def_light_cpu_value[lmNormal].min_temp && gpu_temp_ <= def_light_gpu_value[lmNormal].min_temp){
-                    lights_mode = lmCalm;
+                if(cpu_temp_ <= def_light_cpu_value[ltmNormal].min_temp && gpu_temp_ <= def_light_gpu_value[ltmNormal].min_temp){
+                    lights_temp_mode_ = ltmCalm;
                 }
-                if(cpu_temp_ >= def_light_cpu_value[lmNormal].max_temp || gpu_temp_ >= def_light_gpu_value[lmNormal].max_temp){
-                    lights_mode = lmPower;
-                }
-                break;
-            
-            case lmPower:
-                if(cpu_temp_ <= def_light_cpu_value[lmPower].min_temp && gpu_temp_ <= def_light_gpu_value[lmPower].min_temp){
-                    lights_mode = lmNormal;
-                }
-                if(cpu_temp_ >= def_light_cpu_value[lmPower].max_temp || gpu_temp_ >= def_light_gpu_value[lmPower].max_temp){
-                    lights_mode = lmHell;
+                if(cpu_temp_ >= def_light_cpu_value[ltmNormal].max_temp || gpu_temp_ >= def_light_gpu_value[ltmNormal].max_temp){
+                    lights_temp_mode_ = ltmPower;
                 }
                 break;
             
-            case lmHell:
-                if(cpu_temp_ <= def_light_cpu_value[lmHell].min_temp && gpu_temp_ <= def_light_gpu_value[lmHell].min_temp){
-                    lights_mode = lmPower;
+            case ltmPower:
+                if(cpu_temp_ <= def_light_cpu_value[ltmPower].min_temp && gpu_temp_ <= def_light_gpu_value[ltmPower].min_temp){
+                    lights_temp_mode_ = ltmNormal;
+                }
+                if(cpu_temp_ >= def_light_cpu_value[ltmPower].max_temp || gpu_temp_ >= def_light_gpu_value[ltmPower].max_temp){
+                    lights_temp_mode_ = ltmHell;
+                }
+                break;
+            
+            case ltmHell:
+                if(cpu_temp_ <= def_light_cpu_value[ltmHell].min_temp && gpu_temp_ <= def_light_gpu_value[ltmHell].min_temp){
+                    lights_temp_mode_ = ltmPower;
                 }
                 break;
         }
     }
 
 
-    switch(lights_mode){
-        case lmOff: leds.setHEX(BLACK); break;
-        case lmCalm: leds.setHEX(BLUE); break;
-        case lmNormal: leds.setHEX(GREEN); break;
-        case lmPower: leds.setHEX(YELLOW); break;
-        case lmHell: leds.setHEX(RED); break;
+    if(lmOff == lights_mode_){
+        leds_.setHEX(BLACK);
+    }
+
+    else if(lmColor == lights_mode_){
+        switch(lights_temp_mode_){
+        case ltmCalm: leds_.fadeTo(BLUE, 3000); break;
+        case ltmNormal: leds_.fadeTo(GREEN, 3000); break;
+        case ltmPower: leds_.fadeTo(YELLOW, 3000); break;
+        case ltmHell: leds_.fadeTo(RED, 3000); break;
+        }
+    }
+
+    else if(lmRainbow == lights_mode_){
+        if(millis() - rainbow_timer_ > 10){
+            rainbow_timer_ = millis();
+            hsvColor_++;
+            if(hsvColor_ >= 255){
+                hsvColor_ = 0;
+            }
+        }
+
+        switch(lights_temp_mode_){
+            case ltmCalm: leds_.setHSV(hsvColor_, 255, 255); break;
+            case ltmNormal: leds_.setHSV(hsvColor_, 255, 255); break;
+            case ltmPower: leds_.setHSV(hsvColor_, 150, 255); break;
+            case ltmHell: leds_.setHSV(hsvColor_, 100, 255); break;
+        }
+    }
+
+    else if(lmGamma){
+        switch(lights_temp_mode_){
+            case ltmCalm: leds_.setKelvin(1000); break;
+            case ltmNormal: leds_.setKelvin(1500); break;
+            case ltmPower: leds_.setKelvin(2000); break;
+            case ltmHell: leds_.setKelvin(3000); break;
+        }
     }
 
 }

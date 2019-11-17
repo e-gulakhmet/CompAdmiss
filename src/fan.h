@@ -45,8 +45,8 @@ class Fan {
         void autoMode();
         void off();
         void setSpeed();
-        FanMode getMode() {return fan_mode_;}
-        int getSpeed() {return fan_speed_;}
+        FanMode getMode();
+        int getSpeed();
         bool isManual() {return is_manual_;}
     
     private:
