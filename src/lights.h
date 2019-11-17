@@ -19,14 +19,13 @@
     при повышении температуры.
 */
 
-typedef enum {
-    lmOff = -1,
+typedef enum { // Режимы подсветки
     lmColor, // Переключение цветов
     lmRainbow, // Радуга
     lmGamma // Температура
 } LightsMode;
 
-typedef enum {
+typedef enum { // Режимы температуры
     ltmCalm,
     ltmNormal,
     ltmPower,
@@ -57,14 +56,14 @@ class Lights {
         Lights(uint8_t red_pin, uint8_t green_pin, uint8_t blue_pin);
 
         void tick(uint8_t cpu_temp, uint8_t gpu_temp);
-        void off();
-        void Color();
-        void Rainbow();
-        void Gamma();
-        void setBrightness();
-
-        LightsTempMode getTempMode();
-        LightsMode getMode();
+        void off(); // Выключение ленты
+        void on(); // Включение ленты
+        void Color(); // Эффект переключения цветов
+        void Rainbow(); // Эффект радуги
+        void Gamma(); // Эффект температуры по кельвину
+        void setBrightness(uint8_t bright);
+        String getTempMode(); // Получение режим температуры
+        String getMode(); // Получение режима подцветки
 
     private:
         uint8_t red_pin_;
@@ -75,6 +74,7 @@ class Lights {
         uint8_t gpu_temp_;
         
         unsigned long lights_timer_;
+        bool isOn;
 
         GRGB leds_;
         LightsMode lights_mode_; // Основные режимы работы подсветки

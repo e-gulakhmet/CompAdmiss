@@ -75,3 +75,12 @@ void Fan::on(){
 void Fan::autoMode(){
     is_manual_ = false;
 }
+
+
+
+String Fan::getMode(){
+    switch(fan_mode_){
+        case fmOff: return "Off"; break;
+        case fmOn: return "On"; break;
+    }
+}
