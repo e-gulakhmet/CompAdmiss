@@ -18,9 +18,9 @@ void Lights::tick(uint8_t cpu_temp, uint8_t gpu_temp){
 
     // Оповещение о высокой температуре
     if(cpu_temp_ >= 85 || gpu_temp_ >= 70){ // Если температура больше максимальной
-        if(millis() - lights_timer_ > 500){ // Маргаем красным цветом.
+        if(millis() - am_timer_ > 500){ // Маргаем красным цветом.
             isAlarmTimer_ = !isAlarmTimer_;
-            lights_timer_ = millis();
+            am_timer_ = millis();
         }
         if(isAlarmTimer_){
             leds_.setHEX(BLACK);

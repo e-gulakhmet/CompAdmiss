@@ -75,8 +75,7 @@ class Lights {
         uint8_t gpu_temp_;
         
         bool isOn_;
-
-        unsigned long lights_timer_;
+        unsigned long am_timer_;
         unsigned long rainbow_timer_;
         bool isAlarmTimer_;
         uint8_t hsvColor_;
