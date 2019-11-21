@@ -62,6 +62,8 @@ class Lights {
         void Rainbow(); // Эффект радуги
         void Gamma(); // Эффект температуры по кельвину
         void setBrightness(uint8_t bright);
+        void nextMode();
+        void prevMode();
         //String getTempMode(); // Получение режим температуры
         String getMode(); // Получение режима подцветки
 

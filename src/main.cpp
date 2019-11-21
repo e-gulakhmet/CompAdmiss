@@ -9,7 +9,6 @@
 #include <fan.h>
 #include <lights.h>
 
-
 SoftwareSerial mySerial(TX_PIN, RX_PIN);
 Encoder enc(ENC_A, ENC_B, BUTT_PIN);
 LiquidCrystal_I2C lcd(0x27, 16, 2);
@@ -43,8 +42,42 @@ typedef union {
 
 PCInfo info;
 
-unsigned long timer_info;
+byte charGrad[] = {
+  0x1C,
+  0x14,
+  0x1C,
+  0x00,
+  0x00,
+  0x00,
+  0x00,
+  0x00
+};
 
+byte charFan[] = {
+  0x00,
+  0x1D,
+  0x05,
+  0x1F,
+  0x14,
+  0x17,
+  0x00,
+  0x00
+};
+
+byte charBright[] = {
+  0x00,
+  0x15,
+  0x0E,
+  0x1B,
+  0x0E,
+  0x15,
+  0x00,
+  0x00
+};
+
+uint8_t bright = 50;
+
+unsigned long timer_info;
 // парсинг
 char inData[82];       // массив входных значений (СИМВОЛЫ)
 byte index = 0;
@@ -77,14 +110,25 @@ void parse(PCInfo *info){
 
 
 void show_info(PCInfo *info){
-  lcd.setCursor(0,0);
-  lcd.print("CPU:"); lcd.print(info->info.cpu_temp);
-  lcd.setCursor(0,1);
-  lcd.print("GPU:"); lcd.print(info->info.gpu_temp);
-  lcd.setCursor(10,1);
-  lcd.print("MD:"); lcd.print(leds.getMode());
-
+  enc.tick();
   leds.tick(info->info.cpu_temp, info->info.gpu_temp);
+  fan.tick(info->info.cpu_temp, info->info.gpu_temp);
+
+  // Вывод информации о подсветке
+  lcd.setCursor(0,0); lcd.print(leds.getMode()); 
+  lcd.setCursor(0,1); lcd.write(2); lcd.print("="); lcd.print(bright);
+
+  // Вывод информации о вентиляторах
+  lcd.setCursor(10,0); lcd.write(1); lcd.print(":"); lcd.print(fan.getMode()); 
+
+  if(enc.isLeft()){
+    leds.prevMode();
+  }
+  
+  if(enc.isRight()){
+    leds.nextMode();
+  }
+
 }
 
 
@@ -92,11 +136,18 @@ void show_info(PCInfo *info){
 void setup() {
   Serial.begin(9600);
   mySerial.begin(9600);
-  pinMode(FAN_PIN, OUTPUT);
 
   lcd.begin();
   lcd.backlight();
+  lcd.createChar(0, charGrad);
+  lcd.createChar(1, charFan);
+  lcd.createChar(2, charBright);
 
+  lcd.setCursor(4,0); lcd.print("Who Man");
+  lcd.setCursor(2,1); lcd.print("Technologies");
+  delay(2000);
+  lcd.clear();
+  
   enc.setType(TYPE1);
 }
 
@@ -107,13 +158,7 @@ void loop() {
     parse(&info);
     timer_info = millis();
   }
-  
-  enc.tick();
-  
-  if (enc.isRight()) fan.on();         // если был поворот
-  if (enc.isLeft()) fan.off();
-  if (enc.isRightH()) fan.autoMode(); // если было удержание + поворот
-  if (enc.isLeftH()) Serial.println("Left holded");
+
 
   show_info(&info);
 }

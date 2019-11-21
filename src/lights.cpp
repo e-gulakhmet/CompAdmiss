@@ -191,3 +191,23 @@ String Lights::getMode(){
         case lmKelvin: return "Kelvin"; break;
     }
 }
+
+
+
+void Lights::nextMode(){
+    switch(lights_mode_){
+        case lmColor: lights_mode_ = lmRainbow; break;
+        case lmRainbow: lights_mode_ = lmKelvin; break;
+        case lmKelvin: break;
+    }
+}
+
+
+
+void Lights::prevMode(){
+    switch(lights_mode_){
+        case lmColor: break;
+        case lmRainbow: lights_mode_ = lmColor; break;
+        case lmKelvin: lights_mode_ = lmRainbow; break;
+    }
+}
