@@ -49,13 +49,13 @@ void Lights::tick(uint8_t cpu_temp, uint8_t gpu_temp){
                     break;
                 
                 case lmRainbow: // Режим радуги
-                    uint8_t sat; 
-                    if(cpu_temp_ > gpu_temp_){
-                        sat = map(cpu_temp_, 40, 85, 255, 50);
-                    }
-                    else{
-                        sat = map(gpu_temp_, 30, 85, 255, 50);
-                    }
+                    //uint8_t sat; 
+                    //if(cpu_temp_ > gpu_temp_){
+                    //     sat = map(cpu_temp_, 40, 85, 255, 100);
+                    // }
+                    // else{
+                    //     sat = map(gpu_temp_, 30, 85, 255, 100);
+                    // }
                     if(millis() - rainbow_timer_ > 10){ 
                         rainbow_timer_ = millis();
                         hsvColor_++;
@@ -63,15 +63,15 @@ void Lights::tick(uint8_t cpu_temp, uint8_t gpu_temp){
                         hsvColor_ = 0;
                         }
                     }
-                    leds_.setHSV(hsvColor_, sat, 255);
+                    leds_.setHSV(hsvColor_, 255, 255);
                     break;
 
                 case lmKelvin: // Режим отображения цвета температуры в кельвинах
                     if(cpu_temp_ > gpu_temp_){
-                        leds_.setKelvin(cpu_temp_ * 100);
+                        leds_.setKelvin(cpu_temp_ * 10);
                     }
                     else{
-                        leds_.setKelvin(gpu_temp_ * 100);
+                        leds_.setKelvin(gpu_temp_ * 10);
                     }
                     break;
             }

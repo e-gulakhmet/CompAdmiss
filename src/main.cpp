@@ -16,10 +16,10 @@ Fan fan(FAN_PIN);
 Lights leds(RED_PIN, GREEN_PIN, BLUE_PIN);
 
 typedef enum {
-  msLights,
-  msBright,
-  msFan
-} MainSetting;
+  msmLights = 0,
+  msmBright,
+  msmFan
+} MainSettingMode;
 
 typedef struct {
   uint8_t cpu_temp;
@@ -47,7 +47,7 @@ typedef union {
 } PCInfo;
 
 PCInfo info;
-MainSetting main_sett = msLights;
+MainSettingMode main_sett_mode = msmLights;
 
 byte charGrad[] = {
   0x1C,
@@ -83,7 +83,10 @@ byte charBright[] = {
 };
 
 uint8_t bright = 50;
+bool isSelect;
+bool isCurs;
 
+unsigned long timer_curs;
 unsigned long timer_info;
 // парсинг
 char inData[82];       // массив входных значений (СИМВОЛЫ)
@@ -128,18 +131,76 @@ void show_info(PCInfo *info){
   // Вывод информации о вентиляторах
   lcd.setCursor(10,0); lcd.write(1); lcd.print(":"); lcd.print(fan.getMode()); 
 
+  // TOASK: Как сделать main_sett_mode = main_sett_mode + 1;
 
+  if(!isSelect){
+    if(enc.isRight()){
+      switch(main_sett_mode){
+        case msmLights: main_sett_mode = msmBright; break;
+        case msmBright: main_sett_mode = msmFan; break;
+        case msmFan: break;
+      }
+    }
+    if(enc.isLeft()){
+      switch(main_sett_mode){
+        case msmLights: break;
+        case msmBright: main_sett_mode = msmLights; break;
+        case msmFan: main_sett_mode = msmBright; break;
+      }
+    }
 
-  if(enc.isLeft()){
-    leds.prevMode();
-    lcd.clear();
+  if(enc.isRelease()){
+      isSelect = true;
+    }
   }
+
+  else if(isSelect){
+    if(enc.isHold()){
+        isSelect = false;
+      }
+  }
+
+switch(main_sett_mode){ // Переключение между режимами настроек
+  case msmLights: 
+    // Если мы еще не выбрали, какой режим настраивать(кнопка не была нажата).
+    if(!isSelect){
+      // Маргаем курсором
+      lcd.setCursor(sizeof(leds.getMode()) - 1,0);
+      if(millis() - timer_curs > 500){
+        isCurs = !isCurs;
+        timer_curs = millis();
+      }
+      if(isCurs){
+        lcd.print("_"); 
+      }
+      else{
+        lcd.print(" "); 
+      }
+    }
+
+    // Если выбрали режим(кнопка была нажата)
+    else{
+      lcd.setCursor(sizeof(leds.getMode()) - 1,0);
+      lcd.print("_"); 
+      // Настройка выбранного режима
+      if(enc.isLeft()){
+        leds.prevMode();
+      }
+      else if(enc.isRight()){
+        leds.nextMode();
+      }
+    }
+    break;
   
-  if(enc.isRight()){
-    leds.nextMode();
-    lcd.clear();
+    case msmBright: // Настройка яркости
+      break;
+
+    case msmFan: // Настройка яркости
+      break;
+
   }
 }
+
 
 
 
@@ -168,6 +229,7 @@ void loop() {
     parse(&info);
     timer_info = millis();
   }
+  
 
 
   show_info(&info);
