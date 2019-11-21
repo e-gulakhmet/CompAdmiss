@@ -22,34 +22,34 @@
 typedef enum { // Режимы подсветки
     lmColor, // Переключение цветов
     lmRainbow, // Радуга
-    lmGamma // Температура
+    lmKelvin // Температура
 } LightsMode;
 
-typedef enum { // Режимы температуры
-    ltmCalm,
-    ltmNormal,
-    ltmPower,
-    ltmHell   
-} LightsTempMode;
+// typedef enum { // Режимы температуры
+//     ltmCalm,
+//     ltmNormal,
+//     ltmPower,
+//     ltmHell   
+// } LightsTempMode;
 
-typedef struct {
-    uint8_t min_temp;
-    uint8_t max_temp;
-} DefLightsValue;
+// typedef struct {
+//     uint8_t min_temp;
+//     uint8_t max_temp;
+// } DefLightsValue;
 
-const DefLightsValue def_light_cpu_value[] = {
-                            {0,50},
-                            {51, 70},
-                            {71,80},
-                            {81, 150},
-                            };
+// const DefLightsValue def_light_cpu_value[] = {
+//                             {0,50},
+//                             {51, 70},
+//                             {71,80},
+//                             {81, 150},
+//                             };
 
-const DefLightsValue def_light_gpu_value[] = {
-                            {0,40},
-                            {41, 50},
-                            {51,60},
-                            {61, 70},
-                            };
+// const DefLightsValue def_light_gpu_value[] = {
+//                             {0,40},
+//                             {41, 50},
+//                             {51,60},
+//                             {61, 70},
+//                             };
 
 class Lights {
     public: 
@@ -62,7 +62,7 @@ class Lights {
         void Rainbow(); // Эффект радуги
         void Gamma(); // Эффект температуры по кельвину
         void setBrightness(uint8_t bright);
-        String getTempMode(); // Получение режим температуры
+        //String getTempMode(); // Получение режим температуры
         String getMode(); // Получение режима подцветки
 
     private:
@@ -73,15 +73,20 @@ class Lights {
         uint8_t cpu_temp_;
         uint8_t gpu_temp_;
         
+        bool isOn_;
+
         unsigned long lights_timer_;
-        bool isOn;
-
-        GRGB leds_;
-        LightsMode lights_mode_; // Основные режимы работы подсветки
-        LightsTempMode lights_temp_mode_; // Температурные режимы
-
-        uint8_t hsvColor_;
         unsigned long rainbow_timer_;
+        bool isAlarmTimer_;
+        uint8_t hsvColor_;
+
+        LightsMode lights_mode_; // Основные режимы работы подсветки
+        GRGB leds_;
+
+        //LightsTempMode lights_temp_mode_; // Температурные режимы
+
+
+
 };
 
 
