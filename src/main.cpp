@@ -15,6 +15,12 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 Fan fan(FAN_PIN);
 Lights leds(RED_PIN, GREEN_PIN, BLUE_PIN);
 
+typedef enum {
+  msLights,
+  msBright,
+  msFan
+} MainSetting;
+
 typedef struct {
   uint8_t cpu_temp;
   uint8_t gpu_temp;
@@ -41,6 +47,7 @@ typedef union {
 } PCInfo;
 
 PCInfo info;
+MainSetting main_sett = msLights;
 
 byte charGrad[] = {
   0x1C,
@@ -121,14 +128,17 @@ void show_info(PCInfo *info){
   // Вывод информации о вентиляторах
   lcd.setCursor(10,0); lcd.write(1); lcd.print(":"); lcd.print(fan.getMode()); 
 
+
+
   if(enc.isLeft()){
     leds.prevMode();
+    lcd.clear();
   }
   
   if(enc.isRight()){
     leds.nextMode();
+    lcd.clear();
   }
-
 }
 
 

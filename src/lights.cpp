@@ -16,8 +16,9 @@ void Lights::tick(uint8_t cpu_temp, uint8_t gpu_temp){
     cpu_temp_ = cpu_temp;
     gpu_temp_ = gpu_temp;
 
-    if(cpu_temp_ >= 85 || gpu_temp_ >= 70){
-        if(millis() - lights_timer_ > 500){
+    // Оповещение о высокой температуре
+    if(cpu_temp_ >= 85 || gpu_temp_ >= 70){ // Если температура больше максимальной
+        if(millis() - lights_timer_ > 500){ // Маргаем красным цветом.
             isAlarmTimer_ = !isAlarmTimer_;
             lights_timer_ = millis();
         }
@@ -29,28 +30,33 @@ void Lights::tick(uint8_t cpu_temp, uint8_t gpu_temp){
         }
     }
 
+    // Если температура в рабочих значениях
     else{
-        if(isOn_){
+        if(isOn_){ // Если подсветка включена
             switch(lights_mode_){
-                case lmColor:
+                case lmColor: // Режим изменения цвета
+                    // Если температура процессора больше температуры видеокарты,
+                    // то подсветка зависит от температуры процессора
                     if(cpu_temp_ > gpu_temp_){
                         hsvColor_ = map(cpu_temp_, 40, 85, 128, 255);
                     }
+                    // Если температура видеокарты больше температуры процессора,
+                    // то подсветка зависит от температуры видеокарты
                     else{
                         hsvColor_ = map(gpu_temp_, 30, 85, 128, 255);
                     }
                     leds_.setHSV(hsvColor_, 255, 255);
                     break;
                 
-                case lmRainbow:
+                case lmRainbow: // Режим радуги
                     uint8_t sat; 
                     if(cpu_temp_ > gpu_temp_){
-                        sat = map(cpu_temp_, 0, 85, 255, 50);
+                        sat = map(cpu_temp_, 40, 85, 255, 50);
                     }
                     else{
-                        sat = map(gpu_temp_, 0, 85, 255, 50);
+                        sat = map(gpu_temp_, 30, 85, 255, 50);
                     }
-                    if(millis() - rainbow_timer_ > 10){
+                    if(millis() - rainbow_timer_ > 10){ 
                         rainbow_timer_ = millis();
                         hsvColor_++;
                         if(hsvColor_ >= 255){
@@ -60,7 +66,7 @@ void Lights::tick(uint8_t cpu_temp, uint8_t gpu_temp){
                     leds_.setHSV(hsvColor_, sat, 255);
                     break;
 
-                case lmKelvin:
+                case lmKelvin: // Режим отображения цвета температуры в кельвинах
                     if(cpu_temp_ > gpu_temp_){
                         leds_.setKelvin(cpu_temp_ * 100);
                     }
@@ -71,8 +77,8 @@ void Lights::tick(uint8_t cpu_temp, uint8_t gpu_temp){
             }
         }
 
-        else if(!isOn_){
-            leds_.setHEX(BLACK);
+        else if(!isOn_){ // Если подцветка отключена
+            leds_.setHEX(BLACK); // Светит черный цвет
         }
     }
 
