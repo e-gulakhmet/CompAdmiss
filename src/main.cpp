@@ -244,7 +244,7 @@ void showInfo(PCInfo *info){
         }
         leds.setBrightness(bright);
       }
-    break;
+      break;
 
     case msmFan: // Настройка яркости
       // Если мы еще не выбрали, какой режим настраивать(кнопка не была нажата).
@@ -269,11 +269,11 @@ void showInfo(PCInfo *info){
         lcd.print(">"); 
         // Настройка выбранного режима
         if(enc.isLeft()){
-          fan.off();
+          fan.prevMode();
           lcd.clear();
         }
         else if(enc.isRight()){
-          fan.on();
+          fan.nextMode();
           lcd.clear();
         }
       }
@@ -305,6 +305,10 @@ void setup() {
   lcd.clear();
   
   enc.setType(TYPE1);
+  enc.tick();
+  if(enc.isHold()){ 
+    mode = mSetting;
+  }
 }
 
 
@@ -320,24 +324,11 @@ void loop() {
 
   switch(mode){
     case mMain: // Если включен рабочий режим
-      if(!isSelect && enc.isHold()){ // Если ничего не настраиваем
-                                     // и удерживаем кнопку
-        mode = mSetting; // Включаем режим настроек
-        lcd.clear();
-      }
-      else{ // Если ничего не проиходит
-        showInfo(&info); // Отображаем основную информацию
-      }
+      showInfo(&info); // Отображаем основную информацию
       break;
 
-    case mSetting: 
-      if(!isSelect && enc.isHold()){ 
-        mode = mMain; // Включаем режим отображения информации
-        lcd.clear();
-      }
-      else{ // Если ничего не проиходит
-        showSett(); // Показываем настройки
-      }
+    case mSetting:
+      showSett(); // Показываем настройки
       break;
   }  
 }

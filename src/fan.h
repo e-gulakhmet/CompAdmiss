@@ -15,7 +15,8 @@
 
 typedef enum { // Перечисление всех режимов
     fmOff,
-    fmOn
+    fmOn,
+    fmAuto
 } FanMode;         
 
 typedef struct {
@@ -44,6 +45,8 @@ class Fan {
         void on();
         void autoMode();
         void off();
+        void nextMode();
+        void prevMode();
         void setSpeed();
         String getMode();
         int getSpeed() {return fan_speed_;}
