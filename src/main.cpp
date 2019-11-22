@@ -16,6 +16,11 @@ Fan fan(FAN_PIN);
 Lights leds(RED_PIN, GREEN_PIN, BLUE_PIN);
 
 typedef enum {
+  mMain,
+  mSetting
+} Mode;
+
+typedef enum {
   msmLights = 0,
   msmBright,
   msmFan
@@ -47,6 +52,7 @@ typedef union {
 } PCInfo;
 
 PCInfo info;
+Mode mode = mMain;
 MainSettingMode main_sett_mode = msmLights;
 
 byte charGrad[] = {
@@ -119,14 +125,10 @@ void parse(PCInfo *info){
 
 
 
-void show_info(PCInfo *info){
-  enc.tick();
-  leds.tick(info->info.cpu_temp, info->info.gpu_temp);
-  fan.tick(info->info.cpu_temp, info->info.gpu_temp);
-
+void showInfo(){
   // Вывод информации о подсветке
-  lcd.setCursor(0,0); lcd.print(leds.getMode()); 
-  lcd.setCursor(0,1); lcd.write(2); lcd.print("="); lcd.print(bright);
+  lcd.setCursor(1,0); lcd.print(leds.getMode()); 
+  lcd.setCursor(1,1); lcd.write(2); lcd.print("="); lcd.print(bright);
 
   // Вывод информации о вентиляторах
   lcd.setCursor(10,0); lcd.write(1); lcd.print(":"); lcd.print(fan.getMode()); 
@@ -140,6 +142,7 @@ void show_info(PCInfo *info){
         case msmBright: main_sett_mode = msmFan; break;
         case msmFan: break;
       }
+      lcd.clear();
     }
     if(enc.isLeft()){
       switch(main_sett_mode){
@@ -147,6 +150,7 @@ void show_info(PCInfo *info){
         case msmBright: main_sett_mode = msmLights; break;
         case msmFan: main_sett_mode = msmBright; break;
       }
+      lcd.clear();
     }
 
   if(enc.isRelease()){
@@ -160,18 +164,18 @@ void show_info(PCInfo *info){
       }
   }
 
-switch(main_sett_mode){ // Переключение между режимами настроек
-  case msmLights: 
+  switch(main_sett_mode){ // Переключение между режимами настроек
+    case msmLights: 
     // Если мы еще не выбрали, какой режим настраивать(кнопка не была нажата).
     if(!isSelect){
       // Маргаем курсором
-      lcd.setCursor(sizeof(leds.getMode()) - 1,0);
+      lcd.setCursor(0,0);
       if(millis() - timer_curs > 500){
         isCurs = !isCurs;
         timer_curs = millis();
       }
       if(isCurs){
-        lcd.print("_"); 
+        lcd.print(">"); 
       }
       else{
         lcd.print(" "); 
@@ -180,28 +184,95 @@ switch(main_sett_mode){ // Переключение между режимами 
 
     // Если выбрали режим(кнопка была нажата)
     else{
-      lcd.setCursor(sizeof(leds.getMode()) - 1,0);
-      lcd.print("_"); 
+      lcd.setCursor(0,0);
+      lcd.print(">"); 
       // Настройка выбранного режима
       if(enc.isLeft()){
         leds.prevMode();
+        lcd.clear();
       }
       else if(enc.isRight()){
         leds.nextMode();
+        lcd.clear();
       }
     }
     break;
   
     case msmBright: // Настройка яркости
-      break;
+      // Если мы еще не выбрали, какой режим настраивать(кнопка не была нажата).
+      if(!isSelect){
+        // Маргаем курсором
+        lcd.setCursor(0,1);
+        if(millis() - timer_curs > 500){
+          isCurs = !isCurs;
+          timer_curs = millis();
+        }
+        if(isCurs){
+          lcd.print(">"); 
+        }
+        else{
+          lcd.print(" "); 
+        }
+      }
+
+      // Если выбрали режим(кнопка была нажата)
+      else{
+        lcd.setCursor(0,1);
+        lcd.print(">"); 
+        // Настройка выбранного режима
+        if(enc.isLeft()){
+          bright-= 5;
+          lcd.clear();
+        }
+        else if(enc.isRight()){
+          bright+= 5;
+          lcd.clear();
+        }
+        leds.setBrightness(bright);
+      }
+    break;
 
     case msmFan: // Настройка яркости
-      break;
+      // Если мы еще не выбрали, какой режим настраивать(кнопка не была нажата).
+      if(!isSelect){
+        // Маргаем курсором
+        lcd.setCursor(9,0);
+        if(millis() - timer_curs > 500){
+          isCurs = !isCurs;
+          timer_curs = millis();
+        }
+        if(isCurs){
+          lcd.print(">"); 
+        }
+        else{
+          lcd.print(" "); 
+        }
+      }
 
+      // Если выбрали режим(кнопка была нажата)
+      else{
+        lcd.setCursor(9,0);
+        lcd.print(">"); 
+        // Настройка выбранного режима
+        if(enc.isLeft()){
+          fan.off();
+          lcd.clear();
+        }
+        else if(enc.isRight()){
+          fan.on();
+          lcd.clear();
+        }
+        leds.setBrightness(bright);
+      }
+      break;
   }
 }
 
 
+
+void showSett(){
+
+}
 
 
 void setup() {
@@ -225,14 +296,36 @@ void setup() {
 
 
 void loop() {
+  enc.tick();
+  leds.tick(info.info.cpu_temp, info.info.gpu_temp);
+  fan.tick(info.info.cpu_temp, info.info.gpu_temp);
   if(millis() - timer_info > 5000){
     parse(&info);
     timer_info = millis();
   }
-  
 
+  switch(mode){
+    case mMain: // Если включен рабочий режим
+      if(!isSelect && enc.isHold()){ // Если ничего не настраиваем
+                                     // и удерживаем кнопку
+        mode = mSetting; // Включаем режим настроек
+        lcd.clear();
+      }
+      else{ // Если ничего не проиходит
+        showInfo(); // Отображаем основную информацию
+      }
+      break;
 
-  show_info(&info);
+    case mSetting: 
+      if(!isSelect && enc.isHold()){ 
+        mode = mMain; // Включаем режим отображения информации
+        lcd.clear();
+      }
+      else{ // Если ничего не проиходит
+        showSett(); // Показываем настройки
+      }
+      break;
+  }  
 }
 
 
