@@ -88,6 +88,17 @@ byte charBright[] = {
   0x00
 };
 
+byte charTemp[] = {
+  0x04,
+  0x11,
+  0x12,
+  0x11,
+  0x15,
+  0x09,
+  0x0A,
+  0x1F
+};
+
 uint8_t bright = 50;
 bool isSelect;
 bool isCurs;
@@ -125,13 +136,15 @@ void parse(PCInfo *info){
 
 
 
-void showInfo(){
+void showInfo(PCInfo *info){
   // Вывод информации о подсветке
   lcd.setCursor(1,0); lcd.print(leds.getMode()); 
-  lcd.setCursor(1,1); lcd.write(2); lcd.print("="); lcd.print(bright);
+  lcd.setCursor(1,1); lcd.write(2); lcd.print("=");
+  lcd.print(map(bright, 0, 255, 0, 100)); lcd.print("%");
 
   // Вывод информации о вентиляторах
-  lcd.setCursor(10,0); lcd.write(1); lcd.print(":"); lcd.print(fan.getMode()); 
+  lcd.setCursor(10,0); lcd.write(3); lcd.print("="); lcd.print(info->info.cpu_temp); lcd.write(0);
+  lcd.setCursor(10,1); lcd.write(1); lcd.print(":"); lcd.print(fan.getMode()); 
 
   // TOASK: Как сделать main_sett_mode = main_sett_mode + 1;
 
@@ -144,7 +157,7 @@ void showInfo(){
       }
       lcd.clear();
     }
-    if(enc.isLeft()){
+    else if(enc.isLeft()){
       switch(main_sett_mode){
         case msmLights: break;
         case msmBright: main_sett_mode = msmLights; break;
@@ -153,7 +166,7 @@ void showInfo(){
       lcd.clear();
     }
 
-  if(enc.isRelease()){
+    if(enc.isRelease()){
       isSelect = true;
     }
   }
@@ -161,7 +174,7 @@ void showInfo(){
   else if(isSelect){
     if(enc.isHold()){
         isSelect = false;
-      }
+    }
   }
 
   switch(main_sett_mode){ // Переключение между режимами настроек
@@ -220,6 +233,7 @@ void showInfo(){
         lcd.setCursor(0,1);
         lcd.print(">"); 
         // Настройка выбранного режима
+        bright = constrain(bright, 0, 255);
         if(enc.isLeft()){
           bright-= 5;
           lcd.clear();
@@ -236,7 +250,7 @@ void showInfo(){
       // Если мы еще не выбрали, какой режим настраивать(кнопка не была нажата).
       if(!isSelect){
         // Маргаем курсором
-        lcd.setCursor(9,0);
+        lcd.setCursor(9,1);
         if(millis() - timer_curs > 500){
           isCurs = !isCurs;
           timer_curs = millis();
@@ -251,7 +265,7 @@ void showInfo(){
 
       // Если выбрали режим(кнопка была нажата)
       else{
-        lcd.setCursor(9,0);
+        lcd.setCursor(9,1);
         lcd.print(">"); 
         // Настройка выбранного режима
         if(enc.isLeft()){
@@ -262,7 +276,6 @@ void showInfo(){
           fan.on();
           lcd.clear();
         }
-        leds.setBrightness(bright);
       }
       break;
   }
@@ -284,6 +297,7 @@ void setup() {
   lcd.createChar(0, charGrad);
   lcd.createChar(1, charFan);
   lcd.createChar(2, charBright);
+  lcd.createChar(3, charTemp);
 
   lcd.setCursor(4,0); lcd.print("Who Man");
   lcd.setCursor(2,1); lcd.print("Technologies");
@@ -299,7 +313,7 @@ void loop() {
   enc.tick();
   leds.tick(info.info.cpu_temp, info.info.gpu_temp);
   fan.tick(info.info.cpu_temp, info.info.gpu_temp);
-  if(millis() - timer_info > 5000){
+  if(millis() - timer_info > 100){
     parse(&info);
     timer_info = millis();
   }
@@ -312,7 +326,7 @@ void loop() {
         lcd.clear();
       }
       else{ // Если ничего не проиходит
-        showInfo(); // Отображаем основную информацию
+        showInfo(&info); // Отображаем основную информацию
       }
       break;
 
