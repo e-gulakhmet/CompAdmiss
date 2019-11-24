@@ -5,9 +5,9 @@
 #include <LiquidCrystal_I2C.h>
 #include <GyverEncoder.h>
 
-#include <main.h>
-#include <fan.h>
-#include <lights.h>
+#include "main.h"
+#include "fan.h"
+#include "lights.h"
 
 SoftwareSerial mySerial(TX_PIN, RX_PIN);
 Encoder enc(ENC_A, ENC_B, BUTT_PIN);
@@ -15,45 +15,9 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 Fan fan(FAN_PIN);
 Lights leds(RED_PIN, GREEN_PIN, BLUE_PIN);
 
-typedef enum {
-  mMain,
-  mSetting
-} Mode;
-
-typedef enum {
-  msmLights = 0,
-  msmBright,
-  msmFan
-} MainSettingMode;
-
-typedef struct {
-  uint8_t cpu_temp;
-  uint8_t gpu_temp;
-  uint8_t mb_temp;
-  uint8_t hdd_temp;
-  uint8_t cpu_load;
-  uint8_t gpu_load;
-  uint8_t ram_use;
-  uint8_t gpu_mem_use;
-  uint8_t fan_max;
-  uint8_t fan_min;
-  uint8_t temp_max;
-  uint8_t temp_min;
-  uint8_t fan_manual;
-  uint8_t color_manual;
-  uint8_t fan_ctrl;
-  uint8_t color_ctrl; 
-  uint8_t bright_ctrl;
-} OHMInfo;
-
-typedef union {
-  OHMInfo info;
-  byte data[16];
-} PCInfo;
-
 PCInfo info;
 Mode mode = mMain;
-MainSettingMode main_sett_mode = msmLights;
+MainMode main_mode = msmLights;
 
 byte charGrad[] = {
   0x1C,
@@ -100,8 +64,8 @@ byte charTemp[] = {
 };
 
 uint8_t bright = 50;
-bool isSelect;
-bool isCurs;
+bool is_select = false;
+bool is_curs = false;
 
 unsigned long timer_curs;
 unsigned long timer_info;
@@ -111,7 +75,14 @@ byte index = 0;
 String string_convert;
 
 
+// TODO: Добавить константы 
+// TODO: Сделать функию смены режима на следущий или предыдущий
+// TODO: Оптимизировать функцию возращающую имена режимов
+// TODO: Оптимизировать функицию установки выбранного режима
 
+
+
+// Получение информации от компьютера и сохранение ее в управляющей структуре
 void parse(PCInfo *info){
   while (Serial.available() > 0) {
     char aChar = Serial.read();
@@ -136,9 +107,45 @@ void parse(PCInfo *info){
 
 
 
+void showCursor(uint8_t x, uint8_t y, bool is_blink){ // Вывод курсора
+  lcd.setCursor(x, y);
+  if(is_blink){
+    // Моргаем курсором
+    if(millis() - timer_curs > 500){
+      is_curs = !is_curs;
+      timer_curs = millis();
+    }
+    lcd.print(is_curs?'>':' ');
+  }
+  // Не моргаем
+  else{
+    lcd.print(">"); 
+  }
+}
+
+
+
+MainMode switchMainMode(MainMode curr, bool clockwice){ // Переключение режимов
+  int n = static_cast<int>(curr);
+
+  n += clockwice ? 1 : -1; // Если по часовой стрелке, то ставим следующий
+
+  if( n > 2) {
+    n = 2;
+  }
+  if( n < 0 ){
+    n = 0;
+  }
+  
+  return static_cast<MainMode>(n);
+}
+
+
+
+// Вывод информации на дисплей
 void showInfo(PCInfo *info){
   // Вывод информации о подсветке
-  lcd.setCursor(1,0); lcd.print(leds.getMode()); 
+  lcd.setCursor(1,0); lcd.print(leds.getModeName()); 
   lcd.setCursor(1,1); lcd.write(2); lcd.print("=");
   lcd.print(map(bright, 0, 255, 0, 100)); lcd.print("%");
 
@@ -146,136 +153,32 @@ void showInfo(PCInfo *info){
   lcd.setCursor(10,0); lcd.write(3); lcd.print("="); lcd.print(info->info.cpu_temp); lcd.write(0);
   lcd.setCursor(10,1); lcd.write(1); lcd.print(":"); lcd.print(fan.getMode()); 
 
-  // TOASK: Как сделать main_sett_mode = main_sett_mode + 1;
-
-  if(!isSelect){
-    if(enc.isRight()){
-      switch(main_sett_mode){
-        case msmLights: main_sett_mode = msmBright; break;
-        case msmBright: main_sett_mode = msmFan; break;
-        case msmFan: break;
-      }
-      lcd.clear();
-    }
-    else if(enc.isLeft()){
-      switch(main_sett_mode){
-        case msmLights: break;
-        case msmBright: main_sett_mode = msmLights; break;
-        case msmFan: main_sett_mode = msmBright; break;
-      }
-      lcd.clear();
-    }
-
-    if(enc.isRelease()){
-      isSelect = true;
-    }
-  }
-
-  else if(isSelect){
-    if(enc.isHold()){
-        isSelect = false;
-    }
-  }
-
-  switch(main_sett_mode){ // Переключение между режимами настроек
+  // Настройка курсора в разных режимах
+  switch(main_mode){
     case msmLights: 
-    // Если мы еще не выбрали, какой режим настраивать(кнопка не была нажата).
-    if(!isSelect){
-      // Маргаем курсором
-      lcd.setCursor(0,0);
-      if(millis() - timer_curs > 500){
-        isCurs = !isCurs;
-        timer_curs = millis();
+      if(is_select){ // Если мы уже выбрали режим и настраиваем его
+        showCursor(0,0,false);
       }
-      if(isCurs){
-        lcd.print(">"); 
-      }
-      else{
-        lcd.print(" "); 
-      }
-    }
-
-    // Если выбрали режим(кнопка была нажата)
-    else{
-      lcd.setCursor(0,0);
-      lcd.print(">"); 
-      // Настройка выбранного режима
-      if(enc.isLeft()){
-        leds.prevMode();
-        lcd.clear();
-      }
-      else if(enc.isRight()){
-        leds.nextMode();
-        lcd.clear();
-      }
-    }
-    break;
-  
-    case msmBright: // Настройка яркости
-      // Если мы еще не выбрали, какой режим настраивать(кнопка не была нажата).
-      if(!isSelect){
-        // Маргаем курсором
-        lcd.setCursor(0,1);
-        if(millis() - timer_curs > 500){
-          isCurs = !isCurs;
-          timer_curs = millis();
-        }
-        if(isCurs){
-          lcd.print(">"); 
-        }
-        else{
-          lcd.print(" "); 
-        }
-      }
-
-      // Если выбрали режим(кнопка была нажата)
-      else{
-        lcd.setCursor(0,1);
-        lcd.print(">"); 
-        // Настройка выбранного режима
-        bright = constrain(bright, 0, 255);
-        if(enc.isLeft()){
-          bright-= 5;
-          lcd.clear();
-        }
-        else if(enc.isRight()){
-          bright+= 5;
-          lcd.clear();
-        }
-        leds.setBrightness(bright);
+      else{ // Если мы еще не выбрали, какой режим настраивать(кнопка не была нажата).
+        showCursor(0,0,true);
       }
       break;
 
-    case msmFan: // Настройка яркости
-      // Если мы еще не выбрали, какой режим настраивать(кнопка не была нажата).
-      if(!isSelect){
-        // Маргаем курсором
-        lcd.setCursor(9,1);
-        if(millis() - timer_curs > 500){
-          isCurs = !isCurs;
-          timer_curs = millis();
-        }
-        if(isCurs){
-          lcd.print(">"); 
-        }
-        else{
-          lcd.print(" "); 
-        }
+    case msmBright:
+      if(is_select){
+        showCursor(0,1,false);
       }
-
-      // Если выбрали режим(кнопка была нажата)
       else{
-        lcd.setCursor(9,1);
-        lcd.print(">"); 
-        // Настройка выбранного режима
-        if(enc.isLeft()){
-          fan.prevMode();
-          lcd.clear();
-        }
-        else if(enc.isRight()){
-          fan.nextMode();
-          lcd.clear();
-        }
+        showCursor(0,1,true);
+      }
+      break;
+
+    case msmFan:
+      if(is_select){
+        showCursor(9,1,false);
+      }
+      else{
+        showCursor(9,1,true);
       }
       break;
   }
@@ -288,10 +191,11 @@ void showSett(){
 }
 
 
+
 void setup() {
   Serial.begin(9600);
   mySerial.begin(9600);
-
+  
   lcd.begin();
   lcd.backlight();
   lcd.createChar(0, charGrad);
@@ -315,8 +219,8 @@ void setup() {
 
 void loop() {
   enc.tick();
-  leds.tick(info.info.cpu_temp, info.info.gpu_temp);
-  fan.tick(info.info.cpu_temp, info.info.gpu_temp);
+  leds.update(info.info.cpu_temp, info.info.gpu_temp);
+  fan.update(info.info.cpu_temp, info.info.gpu_temp);
   if(millis() - timer_info > 100){
     parse(&info);
     timer_info = millis();
@@ -325,7 +229,81 @@ void loop() {
   switch(mode){
     case mMain: // Если включен рабочий режим
       showInfo(&info); // Отображаем основную информацию
-      break;
+
+      if(is_select){
+        if(enc.isHold()){
+            is_select = false;
+        }
+      }
+
+      else if ( !is_select ) {
+
+        if ( enc.isRight() ) {
+          main_mode = switchMainMode(main_mode, true);
+          lcd.clear();
+        }
+
+        else if(enc.isLeft()){
+          main_mode = switchMainMode(main_mode, false);
+          lcd.clear();
+        }
+
+        if(enc.isRelease()){
+          is_select = true;
+        }
+      }
+    
+
+      switch(main_mode){ // Переключение между режимами настроек
+        case msmLights: // Настройка режима подсветки
+          // Настройка выбранного режима
+          if(is_select){
+            if(enc.isLeft()){
+              leds.prevMode();
+              lcd.clear();
+            }
+            else if(enc.isRight()){
+              leds.nextMode();
+              lcd.clear();
+            }
+          }
+          break;
+      
+        case msmBright: // Настройка яркости
+          // Если выбрали режим(кнопка была нажата)
+            if(is_select){
+            // Настройка выбранного режима
+            bright = constrain(bright, 0, 255);
+            if(enc.isLeft()){
+              bright-= 5;
+              lcd.clear();
+            }
+            else if(enc.isRight()){
+              bright+= 5;
+              lcd.clear();
+            }
+            leds.setBrightness(bright);
+          }
+          break;
+
+        case msmFan: // Настройка яркости
+          // Если выбрали режим(кнопка была нажата)
+          if(is_select){
+            // Настройка выбранного режима
+            if(enc.isLeft()){
+              fan.prevMode();
+              lcd.clear();
+            }
+            else if(enc.isRight()){
+              fan.nextMode();
+              lcd.clear();
+            }
+          }
+          break;
+
+        }
+        break;
+
 
     case mSetting:
       showSett(); // Показываем настройки

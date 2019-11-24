@@ -9,8 +9,6 @@
     выводится предупреждение.
 */
 
-
-
 #include <Arduino.h>
 
 typedef enum { // Перечисление всех режимов
@@ -33,15 +31,13 @@ const DefValue def_cpu_value[] = { // Значения по умолчанию
 const DefValue def_gpu_value[] = { // Значения по умолчанию
                             {0,0,45},
                             {255,46,150},
-                            };
-
-// TODO: Добавить константы                            
+                            };                           
 
 class Fan {
     public:
         Fan(uint8_t fan_pin);
 
-        void tick(uint8_t cpu_temp, uint8_t gpu_temp);
+        void update(uint8_t cpu_temp, uint8_t gpu_temp);
         void on();
         void autoMode();
         void off();
@@ -50,7 +46,6 @@ class Fan {
         void setSpeed();
         String getMode();
         int getSpeed() {return fan_speed_;}
-        bool isManual() {return is_manual_;}
     
     private:
         uint8_t fan_pin_;
@@ -60,14 +55,10 @@ class Fan {
         uint8_t gpu_temp_;   // Температура видеокарты
 
         unsigned long fan_timer_;
-        bool is_manual_;
-        bool is_online_;
 
         FanMode fan_mode_;
 };
 
 
-#endif
 
-
-
+#endif // _FAN_H_

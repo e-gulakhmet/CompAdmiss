@@ -5,24 +5,20 @@
 #include <GyverRGB.h>
 
 /*
-    Класс подсветки, сдедит за температурой и нагрузкой видеокарты и процессора.
-    При запуске включается выбранный режим подсветки, затем взависимости от режима работы
+    Класс подсветки, следит за температурой и нагрузкой видеокарты и процессора.
+    При запуске включается выбранный режим подсветки, затем в зависимости от режима работы
     цвета становятся более яркими(холодные цвета перестают использоваться).
 
-    Цвета ленты на прямую зависят от температуры, так как используется "map"
+    Цвета ленты напрямую зависят от температуры, так как используется "map"
 
-    Первый и основной режим подсветки - это изменение цвета взависимости от температуры.
+    Первый и основной режим подсветки - это изменение цвета в зависимости от температуры.
     Второй режим подсветки - это радуга которая при повышении температуры,
     уходит в белые тона.
     Третий режим - это измение оттенка красного цвета,
     при повышении температуры.
 */
 
-typedef enum { // Режимы подсветки
-    lmColor, // Переключение цветов
-    lmRainbow, // Радуга
-    lmKelvin // Температура
-} LightsMode;
+
 
 // typedef enum { // Режимы температуры
 //     ltmCalm,
@@ -54,17 +50,20 @@ class Lights {
     public: 
         Lights(uint8_t red_pin, uint8_t green_pin, uint8_t blue_pin);
 
-        void tick(uint8_t cpu_temp, uint8_t gpu_temp);
+        typedef enum { // Режимы подсветки
+            lmColor, // Переключение цветов
+            lmRainbow, // Радуга
+            lmKelvin // Температура
+        } LightsMode;
+        
+        void update(uint8_t cpu_temp, uint8_t gpu_temp);
         void off(); // Выключение ленты
         void on(); // Включение ленты
-        void Color(); // Эффект переключения цветов
-        void Rainbow(); // Эффект радуги
-        void Gamma(); // Эффект температуры по кельвину
         void setBrightness(uint8_t bright);
         void nextMode();
         void prevMode();
         //String getTempMode(); // Получение режим температуры
-        String getMode(); // Получение режима подцветки
+        String getModeName(); // Получение режима подцветки
 
     private:
         uint8_t red_pin_;
@@ -74,10 +73,10 @@ class Lights {
         uint8_t cpu_temp_;
         uint8_t gpu_temp_;
         
-        bool isOn_;
+        bool is_on_;
         unsigned long am_timer_;
         unsigned long rainbow_timer_;
-        bool isAlarmTimer_;
+        bool is_alarm_timer_;
         uint8_t hsvColor_;
 
         LightsMode lights_mode_; // Основные режимы работы подсветки
@@ -90,4 +89,4 @@ class Lights {
 };
 
 
-#endif
+#endif // _LIGHTS_H_
