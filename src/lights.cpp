@@ -191,11 +191,7 @@ void Lights::setBrightness(uint8_t bright){
                                     //return mode_names[curr_mode_];
                                     //}
 String Lights::getModeName(){ 
-    switch(lights_mode_){
-        case lmColor: return "Color";
-        case lmRainbow: return "Rainbow";
-        case lmKelvin: return "Kelvin";
-    }
+    return mode_name_[lights_mode_];
 }
 
 

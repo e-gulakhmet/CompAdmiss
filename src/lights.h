@@ -79,6 +79,8 @@ class Lights {
         bool is_alarm_timer_;
         uint8_t hsvColor_;
 
+        String mode_name_[3] = {"Color", "Rainbow", "Kelvin"};
+
         LightsMode lights_mode_; // Основные режимы работы подсветки
         GRGB leds_;
 

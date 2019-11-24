@@ -76,7 +76,6 @@ String string_convert;
 
 
 // TODO: Добавить константы 
-// TODO: Сделать функию смены режима на следущий или предыдущий
 // TODO: Оптимизировать функцию возращающую имена режимов
 // TODO: Оптимизировать функицию установки выбранного режима
 
@@ -151,7 +150,7 @@ void showInfo(PCInfo *info){
 
   // Вывод информации о вентиляторах
   lcd.setCursor(10,0); lcd.write(3); lcd.print("="); lcd.print(info->info.cpu_temp); lcd.write(0);
-  lcd.setCursor(10,1); lcd.write(1); lcd.print(":"); lcd.print(fan.getMode()); 
+  lcd.setCursor(10,1); lcd.write(1); lcd.print(":"); lcd.print(fan.getModeName()); 
 
   // Настройка курсора в разных режимах
   switch(main_mode){

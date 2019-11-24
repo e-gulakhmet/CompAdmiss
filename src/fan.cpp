@@ -4,8 +4,8 @@
 
 Fan::Fan(uint8_t fan_pin)
     : fan_pin_(fan_pin)
-    , fan_mode_(fmAuto)
     , fan_speed_(0)
+    , fan_mode_(fmAuto)
     {
         pinMode(fan_pin_, OUTPUT);
     }
@@ -37,12 +37,10 @@ void Fan::update(uint8_t cpu_temp, uint8_t gpu_temp){
             if(millis() - fan_timer_ > 5000){ // Измеряем температуру, каждые 5 секунд.
                 fan_timer_ = millis();
                 // Выбираем режим
-                if(cpu_temp_ > def_cpu_value[fmOff].max_temp
-                    || gpu_temp_ > def_gpu_value[fmOff].max_temp){
+                if(cpu_temp_ > 65 || gpu_temp_ > 45){
                     fan_speed_ = 255;
                 }
-                else if(cpu_temp_ < def_cpu_value[fmOn].min_temp
-                        || gpu_temp_ < def_gpu_value[fmOn].min_temp){
+                else if(cpu_temp_ < 66 || gpu_temp_ < 46){
                     fan_speed_ = 0;
                 }
             }
@@ -56,32 +54,25 @@ void Fan::update(uint8_t cpu_temp, uint8_t gpu_temp){
 
 
 void Fan::off(){
-    //is_manual_ = true;
     fan_mode_ = fmOff;
 }
 
 
 
 void Fan::on(){
-    //is_manual_ = true;
     fan_mode_ = fmOn;
 }
 
 
 
 void Fan::autoMode(){
-    //is_manual_ = false;
     fan_mode_ = fmAuto;
 }
 
 
 
-String Fan::getMode(){
-    switch(fan_mode_){
-        case fmOff: return "Off"; break;
-        case fmOn: return "On"; break;
-        case fmAuto: return "Auto"; break;
-    }
+String Fan::getModeName(){
+    return get_mode_name_[fan_mode_];
 }
 
 
