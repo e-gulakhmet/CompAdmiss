@@ -37,10 +37,10 @@ void Fan::update(uint8_t cpu_temp, uint8_t gpu_temp) {
             if (millis() - fan_timer_ > 5000) { // Измеряем температуру, каждые 5 секунд.
                 fan_timer_ = millis();
                 // Выбираем режим
-                if (cpu_temp_ > 65 || gpu_temp_ > 45) {
+                if (cpu_temp_ > 50 || gpu_temp_ > 45) {
                     fan_speed_ = 255;
                 }
-                else if (cpu_temp_ < 66 || gpu_temp_ < 46) {
+                else if (cpu_temp_ < 51 || gpu_temp_ < 46) {
                     fan_speed_ = 0;
                 }
             }

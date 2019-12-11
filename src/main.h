@@ -17,8 +17,7 @@ const uint8_t ENC_B = 3;     // пин энкодера
 const uint8_t ENC_TYPE = 1;  // тип энкодера, 0 или 1
 const uint8_t BUTT_PIN = 7;  // пин кнопки
 
-const uint16_t TIMEOUT = 5000; // Время после которого перестаем подключаться к компьютеру
-const uint8_t BRIGHT = 100; // Стандартная яркость
+const uint8_t BRIGHT = 200; // Стандартная яркость
 
 typedef enum {
   mMain,

@@ -18,34 +18,6 @@
     при повышении температуры.
 */
 
-
-
-// typedef enum { // Режимы температуры
-//     ltmCalm,
-//     ltmNormal,
-//     ltmPower,
-//     ltmHell   
-// } LightsTempMode;
-
-// typedef struct {
-//     uint8_t min_temp;
-//     uint8_t max_temp;
-// } DefLightsValue;
-
-// const DefLightsValue def_light_cpu_value[] = {
-//                             {0,50},
-//                             {51, 70},
-//                             {71,80},
-//                             {81, 150},
-//                             };
-
-// const DefLightsValue def_light_gpu_value[] = {
-//                             {0,40},
-//                             {41, 50},
-//                             {51,60},
-//                             {61, 70},
-//                             };
-
 class Lights {
     public: 
         Lights(uint8_t red_pin, uint8_t green_pin, uint8_t blue_pin);
@@ -78,16 +50,14 @@ class Lights {
         unsigned long rainbow_timer_;
         bool is_alarm_timer_;
         uint8_t hsvColor_;
+        uint8_t red_;
+        uint8_t green_;
+        uint8_t blue_;
 
         String mode_name_[3] = {"Color", "Rainbow", "Kelvin"};
 
         LightsMode lights_mode_; // Основные режимы работы подсветки
         GRGB leds_;
-
-        //LightsTempMode lights_temp_mode_; // Температурные режимы
-
-
-
 };
 
 

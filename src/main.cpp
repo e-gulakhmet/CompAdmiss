@@ -63,7 +63,7 @@ byte charTemp[] = {
   0x1F
 };
 
-uint8_t bright = 50;
+uint8_t bright = BRIGHT;
 bool is_select = false;
 bool is_curs = false;
 
@@ -219,7 +219,7 @@ void loop() {
   enc.tick();
   leds.update(info.info.cpu_temp, info.info.gpu_temp);
   fan.update(info.info.cpu_temp, info.info.gpu_temp);
-  if (millis() - timer_info > 100) {
+  if (millis() - timer_info > 1000) {
     parse(&info);
     timer_info = millis();
   }
