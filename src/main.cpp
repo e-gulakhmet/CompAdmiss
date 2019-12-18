@@ -76,6 +76,7 @@ String string_convert;
 
 
 
+
 // TODO: Добавить константы 
 
 
@@ -88,7 +89,8 @@ void parse(PCInfo *info) {
       inData[index] = aChar;
       index++;
       inData[index] = '\0';
-    } else {
+    } 
+    else {
       char *p = inData;
       char *str;
       index = 0;
