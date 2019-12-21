@@ -153,6 +153,7 @@ void showInfo(PCInfo *info) {
   lcd.setCursor(10,0); lcd.write(3); lcd.print("="); lcd.print(info->info.cpu_temp); lcd.write(0);
   lcd.setCursor(10,1); lcd.write(1); lcd.print(":"); lcd.print(fan.getModeName()); 
 
+
   // Настройка курсора в разных режимах
   switch(main_mode) {
     case msmLights: 
