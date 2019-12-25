@@ -34,6 +34,7 @@ class Lights {
         void setBrightness(uint8_t bright);
         void nextMode();
         void prevMode();
+        void setMode(uint8_t index);
         //String getTempMode(); // Получение режим температуры
         String getModeName(); // Получение режима подцветки
 

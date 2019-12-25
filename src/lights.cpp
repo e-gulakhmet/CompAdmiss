@@ -20,7 +20,7 @@ void Lights::update(uint8_t cpu_temp, uint8_t gpu_temp){
     gpu_temp_ = gpu_temp;
 
     // Оповещение о высокой температуре
-    if (cpu_temp_ >= 90 || gpu_temp_ >= 75){ // Если температура больше максимальной
+    if (cpu_temp_ >= 90 || gpu_temp_ >= 85){ // Если температура больше максимальной
         if (millis() - am_timer_ > 500){ // Моргаем красным цветом.
             is_alarm_timer_ = !is_alarm_timer_;
             am_timer_ = millis();
@@ -41,10 +41,10 @@ void Lights::update(uint8_t cpu_temp, uint8_t gpu_temp){
                 // Если температура процессора больше температуры видеокарты,
                 // то подсветка зависит от температуры процессора
                 if (cpu_temp_ > gpu_temp_) {
-                    if(cpu_temp_ >= 40 && cpu_temp_ <= 60){
+                    if(cpu_temp_ >= 30 && cpu_temp_ <= 60){
                         red_ = 0;
-                        green_ = map(cpu_temp_, 40, 60, 255, 0);
-                        blue_ = map(cpu_temp_, 40, 60, 0, 255);
+                        green_ = map(cpu_temp_, 30, 60, 255, 0);
+                        blue_ = map(cpu_temp_, 30, 60, 0, 255);
                     }
                     if(cpu_temp_ >= 61 && cpu_temp_ <= 90){
                         green_ = 0;
@@ -63,8 +63,8 @@ void Lights::update(uint8_t cpu_temp, uint8_t gpu_temp){
                     }
                     if(gpu_temp_ >= 56 && gpu_temp_ <= 75){
                         green_ = 0;
-                        blue_ = map(gpu_temp_, 51, 90, 255, 0);
-                        red_ = map(gpu_temp_, 51, 90, 0, 255);
+                        blue_ = map(gpu_temp_, 51, 85, 255, 0);
+                        red_ = map(gpu_temp_, 51, 85, 0, 255);
                     }
                 leds_.fadeTo(red_, green_, blue_, 1000);
                 }
@@ -136,4 +136,14 @@ void Lights::prevMode() {
         case lmRainbow: lights_mode_ = lmColor; break;
         case lmKelvin: lights_mode_ = lmRainbow; break;
     }
+}
+
+
+
+void Lights::setMode(uint8_t index) {
+    if (index > lmKelvin) {
+        // Ругнуться
+        return;
+    }
+    lights_mode_ = static_cast<LightsMode>(index);
 }

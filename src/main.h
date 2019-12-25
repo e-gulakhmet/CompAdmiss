@@ -55,4 +55,13 @@ typedef union {
   byte data[16];
 } PCInfo;
 
+typedef struct {
+  uint8_t fan_mode;
+  uint8_t fan_step_temp;
+  uint8_t lights_mode;
+  uint8_t lights_bright;
+} ManageInfo;
+
+
+
 #endif // _MAIN_H_
