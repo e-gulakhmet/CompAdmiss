@@ -33,10 +33,10 @@ typedef enum {
 typedef struct {
   uint8_t cpu_temp;
   uint8_t gpu_temp;
-  uint8_t mb_temp;
-  uint8_t hdd_temp;
-  uint8_t cpu_load;
-  uint8_t gpu_load;
+  uint8_t fan_mode;
+  uint8_t fan_step_temp;
+  uint8_t lights_mode;
+  uint8_t lights_bright;
   uint8_t ram_use;
   uint8_t gpu_mem_use;
   uint8_t fan_max;

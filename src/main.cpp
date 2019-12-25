@@ -16,7 +16,6 @@ Fan fan(FAN_PIN);
 Lights leds(RED_PIN, GREEN_PIN, BLUE_PIN);
 
 PCInfo info;
-Mode mode = mMain;
 MainMode main_mode = msmLights;
 
 byte charGrad[] = {
@@ -73,9 +72,6 @@ unsigned long timer_info;
 char inData[82];       // массив входных значений (СИМВОЛЫ)
 byte index = 0;
 String string_convert;
-
-
-
 
 // TODO: Добавить константы 
 
@@ -186,13 +182,6 @@ void showInfo(PCInfo *info) {
 }
 
 
-
-void showSett() {
-
-}
-
-
-
 void setup() {
   Serial.begin(9600);
   mySerial.begin(9600);
@@ -211,9 +200,6 @@ void setup() {
   
   enc.setType(TYPE1);
   enc.tick();
-  if (enc.isHold()) { 
-    mode = mSetting;
-  }
 }
 
 
@@ -227,89 +213,78 @@ void loop() {
     timer_info = millis();
   }
 
-  switch(mode) {
-    case mMain: // Если включен рабочий режим
-      showInfo(&info); // Отображаем основную информацию
+  showInfo(&info); // Отображаем основную информацию
+  if (is_select) {
+    if (enc.isHold()) {
+        is_select = false;
+    }
+  }
 
+  else if ( !is_select ) {
+    if ( enc.isRight() ) {
+      main_mode = switchMainMode(main_mode, true);
+      lcd.clear();
+    }
+
+    else if (enc.isLeft()) {
+      main_mode = switchMainMode(main_mode, false);
+      lcd.clear();
+    }
+
+    if (enc.isRelease()) {
+      is_select = true;
+    }
+  }
+
+
+  switch(main_mode) { // Переключение между режимами настроек
+    case msmLights: // Настройка режима подсветки
+      // Настройка выбранного режима
       if (is_select) {
-        if (enc.isHold()) {
-            is_select = false;
-        }
-      }
-
-      else if ( !is_select ) {
-
-        if ( enc.isRight() ) {
-          main_mode = switchMainMode(main_mode, true);
+        if (enc.isLeft()) {
+          leds.prevMode();
           lcd.clear();
         }
-
-        else if (enc.isLeft()) {
-          main_mode = switchMainMode(main_mode, false);
+        else if (enc.isRight()) {
+          leds.nextMode();
           lcd.clear();
         }
-
-        if (enc.isRelease()) {
-          is_select = true;
-        }
       }
-    
-
-      switch(main_mode) { // Переключение между режимами настроек
-        case msmLights: // Настройка режима подсветки
-          // Настройка выбранного режима
-          if (is_select) {
-            if (enc.isLeft()) {
-              leds.prevMode();
-              lcd.clear();
-            }
-            else if (enc.isRight()) {
-              leds.nextMode();
-              lcd.clear();
-            }
-          }
-          break;
-      
-        case msmBright: // Настройка яркости
-          // Если выбрали режим(кнопка была нажата)
-            if (is_select) {
-            // Настройка выбранного режима
-            bright = constrain(bright, 0, 255);
-            if (enc.isLeft()) {
-              bright-= 5;
-              lcd.clear();
-            }
-            else if (enc.isRight()) {
-              bright+= 5;
-              lcd.clear();
-            }
-            leds.setBrightness(bright);
-          }
-          break;
-
-        case msmFan: // Настройка яркости
-          // Если выбрали режим(кнопка была нажата)
-          if (is_select) {
-            // Настройка выбранного режима
-            if (enc.isLeft()) {
-              fan.prevMode();
-              lcd.clear();
-            }
-            else if (enc.isRight()) {
-              fan.nextMode();
-              lcd.clear();
-            }
-          }
-          break;
-
-        }
-        break;
-
-
-    case mSetting:
-      showSett(); // Показываем настройки
       break;
-  }  
+  
+    case msmBright: // Настройка яркости
+      // Если выбрали режим(кнопка была нажата)
+        if (is_select) {
+        // Настройка выбранного режима
+        bright = constrain(bright, 0, 255);
+        if (enc.isLeft()) {
+          bright-= 5;
+          lcd.clear();
+        }
+        else if (enc.isRight()) {
+          bright+= 5;
+          lcd.clear();
+        }
+        leds.setBrightness(bright);
+      }
+      break;
+
+    case msmFan: // Настройка яркости
+      // Если выбрали режим(кнопка была нажата)
+      if (is_select) {
+        // Настройка выбранного режима
+        if (enc.isLeft()) {
+          fan.prevMode();
+          lcd.clear();
+        }
+        else if (enc.isRight()) {
+          fan.nextMode();
+          lcd.clear();
+        }
+      }
+      break;
+
+    }
 }
 
 
