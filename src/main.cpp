@@ -1,5 +1,4 @@
 #include <Arduino.h>
-#include <SoftwareSerial.h>
 #include <OneButton.h>
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
@@ -8,13 +7,11 @@
 #include "fan.h"
 #include "lights.h"
 
-SoftwareSerial mySerial(TX_PIN, RX_PIN);
 Fan fan(FAN_PIN);
 Lights leds(RED_PIN, GREEN_PIN, BLUE_PIN);
 
 PCInfo info;
 MainMode main_mode = msmLights;
-ManageInfo manage_info;
 
 uint8_t bright = BRIGHT;
 bool is_select = false;
@@ -57,6 +54,38 @@ void parse(PCInfo *info) {
 
 
 
+void sendData(PCInfo info) {
+  char data[4];
+  String str;
+  // Отправляем данные вентилятора
+  Serial.write("F:");
+  for(int i = 2; i <= 3; i++) {
+    str = String(info.data[i]);
+    str.toCharArray(data,4);
+    Serial.write(data); Serial.write(";");
+  }
+  // Отправляем данные подсветки
+
+  Serial.write("L:");
+  for(int i = 4; i <= 5; i++) {
+    str = String(info.data[i]);
+    str.toCharArray(data,4);
+    Serial.write(data); Serial.write(";");
+  }
+
+  Serial.write("E");
+  
+  // Serial.write(info.info.fan_mode); Serial.write(";");
+  // Serial.write(info.info.fan_step_temp); Serial.write(";");
+  
+  // Serial.write("L:");
+  // Serial.write(info.info.lights_mode); Serial.write(";");
+  // Serial.write("10"); Serial.write(";");
+  // Serial.write("E");
+}
+
+
+
 MainMode switchMainMode(MainMode curr, bool clockwice) { // Переключение режимов
   int n = static_cast<int>(curr);
 
@@ -68,7 +97,6 @@ MainMode switchMainMode(MainMode curr, bool clockwice) { // Переключен
   if ( n < 0 ) {
     n = 0;
   }
-  
   return static_cast<MainMode>(n);
 }
 
@@ -76,7 +104,6 @@ MainMode switchMainMode(MainMode curr, bool clockwice) { // Переключен
 
 void setup() {
   Serial.begin(9600);
-  mySerial.begin(9600);
 }
 
 
@@ -84,12 +111,11 @@ void setup() {
 void loop() {
   leds.update(info.info.cpu_temp, info.info.gpu_temp);
   fan.update(info.info.cpu_temp, info.info.gpu_temp);
-  if (millis() - timer_info > 1000) {
+  if (millis() - timer_info > 2000) {
     parse(&info);
+    sendData(info);
     timer_info = millis();
   }
-  leds.setMode(info.info.lights_mode);
-  leds.setBrightness(info.info.lights_bright);
 
 }
 
