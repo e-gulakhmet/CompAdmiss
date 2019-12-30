@@ -64,24 +64,14 @@ void sendData(PCInfo info) {
     str.toCharArray(data,4);
     Serial.write(data); Serial.write(";");
   }
-  // Отправляем данные подсветки
 
+  // Отправляем данные подсветки
   Serial.write("L:");
   for(int i = 4; i <= 5; i++) {
     str = String(info.data[i]);
     str.toCharArray(data,4);
     Serial.write(data); Serial.write(";");
   }
-
-  Serial.write("E");
-  
-  // Serial.write(info.info.fan_mode); Serial.write(";");
-  // Serial.write(info.info.fan_step_temp); Serial.write(";");
-  
-  // Serial.write("L:");
-  // Serial.write(info.info.lights_mode); Serial.write(";");
-  // Serial.write("10"); Serial.write(";");
-  // Serial.write("E");
 }
 
 
