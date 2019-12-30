@@ -55,23 +55,24 @@ void parse(PCInfo *info) {
 
 
 void sendData(PCInfo info) {
-  char data[4];
-  String str;
+  String str = String("F:") + info.info.fan_mode + ',' + info.info.fan_step_temp 
+             + String(";L:") + info.info.lights_mode + ',' + info.info.lights_bright + ';';
   // Отправляем данные вентилятора
-  Serial.write("F:");
-  for(int i = 2; i <= 3; i++) {
-    str = String(info.data[i]);
-    str.toCharArray(data,4);
-    Serial.write(data); Serial.write(";");
-  }
+  Serial.print(str);
+  // for(int i = 2; i <= 3; i++) {
+  //   str = String(info.data[i]);
+  //   str.toCharArray(data,4);
+  //   Serial.write(data); Serial.write(",");
+  // Serial.write(";")
+  // }
 
-  // Отправляем данные подсветки
-  Serial.write("L:");
-  for(int i = 4; i <= 5; i++) {
-    str = String(info.data[i]);
-    str.toCharArray(data,4);
-    Serial.write(data); Serial.write(";");
-  }
+  // // Отправляем данные подсветки
+  // Serial.write("L:");
+  // for(int i = 4; i <= 5; i++) {
+  //   str = String(info.data[i]);
+  //   str.toCharArray(data,4);
+  //   Serial.write(data); Serial.write(";");
+  // }
 }
 
 
