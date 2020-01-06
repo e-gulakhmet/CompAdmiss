@@ -58,24 +58,28 @@ typedef union {
 } PCInfo;
 
 typedef struct {
-  int one;
-  int two;
-  int three;
-  int four;
-  int five;
-  int six;
-  int seven;
-  int eight;
-  int nine;
-  int zero;
-  int star;
-  int grid;
-  int up;
-  int down;
-  int left;
-  int right;
-  int ok;
+  unsigned long one;
+  unsigned long two;
+  unsigned long three;
+  unsigned long four;
+  unsigned long five;
+  unsigned long six;
+  unsigned long seven;
+  unsigned long eight;
+  unsigned long nine;
+  unsigned long star;
+  unsigned long zero;
+  unsigned long grid;
+  unsigned long up;
+  unsigned long left;
+  unsigned long ok;
+  unsigned long right;
+  unsigned long down; 
 } RemoteButt;
 
+typedef union {
+  RemoteButt butt;
+  unsigned long info[17];
+} RemoteInfo;
 
 #endif // _MAIN_H_
