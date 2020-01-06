@@ -1,7 +1,6 @@
 #include <Arduino.h>
 #include <OneButton.h>
-#include <Wire.h>
-#include <LiquidCrystal_I2C.h>
+#include <IRremote.h>
 
 #include "main.h"
 #include "fan.h"
@@ -9,23 +8,28 @@
 
 Fan fan(FAN_PIN);
 Lights leds(RED_PIN, GREEN_PIN, BLUE_PIN);
+IRrecv remote(REMOTE_PIN);
 
 PCInfo info;
 MainMode main_mode = msmLights;
+RemoteButt remoteButt;
 
 uint8_t bright = BRIGHT;
 bool is_select = false;
 bool is_curs = false;
 
-unsigned long timer_curs;
+
 unsigned long timer_info;
+unsigned long timer_ir;
+
 // парсинг
 char inData[82];       // массив входных значений (СИМВОЛЫ)
 byte index = 0;
 String string_convert;
 
+decode_results results;
+
 // TODO: Добавить константы 
-// TODO: Сделать функцию отправления данных в порт
 
 
 // Получение информации от компьютера и сохранение ее в управляющей структуре
@@ -59,20 +63,6 @@ void sendData(PCInfo info) {
              + String(";L:") + info.info.lights_mode + ',' + info.info.lights_bright + ';';
   // Отправляем данные вентилятора
   Serial.print(str);
-  // for(int i = 2; i <= 3; i++) {
-  //   str = String(info.data[i]);
-  //   str.toCharArray(data,4);
-  //   Serial.write(data); Serial.write(",");
-  // Serial.write(";")
-  // }
-
-  // // Отправляем данные подсветки
-  // Serial.write("L:");
-  // for(int i = 4; i <= 5; i++) {
-  //   str = String(info.data[i]);
-  //   str.toCharArray(data,4);
-  //   Serial.write(data); Serial.write(";");
-  // }
 }
 
 
@@ -95,6 +85,8 @@ MainMode switchMainMode(MainMode curr, bool clockwice) { // Переключен
 
 void setup() {
   Serial.begin(9600);
+
+  remote.enableIRIn(); // Включаем получение данных от пульта
 }
 
 
@@ -104,9 +96,20 @@ void loop() {
   fan.update(info.info.cpu_temp, info.info.gpu_temp);
   if (millis() - timer_info > 2000) {
     parse(&info);
-    sendData(info);
+    //sendData(info);
     timer_info = millis();
   }
+
+
+  if(millis() - timer_ir > 1000){
+    if (remote.decode(&results)) { // Если данные от пульта получены
+      Serial.println(results.value); 
+      // sendData(info); // Отправляем данные компьютеру
+      remote.resume(); // Получаем следующее значение
+      timer_ir = millis();
+    }
+  }
+
 
 }
 

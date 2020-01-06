@@ -19,6 +19,8 @@ const uint8_t BUTT_PIN = 7;  // пин кнопки
 
 const uint8_t BRIGHT = 200; // Стандартная яркость
 
+const uint8_t REMOTE_PIN = A0; // Пин ик приемника
+
 typedef enum {
   mMain,
   mSetting
@@ -54,6 +56,26 @@ typedef union {
   OHMInfo info;
   byte data[16];
 } PCInfo;
+
+typedef struct {
+  int one;
+  int two;
+  int three;
+  int four;
+  int five;
+  int six;
+  int seven;
+  int eight;
+  int nine;
+  int zero;
+  int star;
+  int grid;
+  int up;
+  int down;
+  int left;
+  int right;
+  int ok;
+} RemoteButt;
 
 
 #endif // _MAIN_H_
