@@ -34,8 +34,25 @@ class Remote{
         } RemoteInfo;
         
         void update();
-        void setRemoteButtons(RemoteInfo *info);
-        uint8_t isInfoGot(){return results_.decode_type;}
+        void setRemoteButtons();
+        bool isInfoGot(){return results_.decode_type;}
+        bool isButtOne();
+        bool isButtTwo();
+        bool isButtThree();
+        bool isButtFour();
+        bool isButtFive();
+        bool isButtSix();
+        bool isButtSeven();
+        bool isButtEight();
+        bool isButtNine();
+        bool isButtZero();
+        bool isButtStar();
+        bool isButtGrid();
+        bool isButtUp();
+        bool isButtDown();
+        bool isButtLeft();
+        bool isButtRight();
+        bool isButtOk();
 
     private:
         uint8_t ir_pin_;
@@ -45,6 +62,7 @@ class Remote{
 
         decode_results results_;
 
+        RemoteInfo info_;
         IRrecv remote_;
 };
 
