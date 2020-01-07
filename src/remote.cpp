@@ -2,9 +2,9 @@
 
 Remote::Remote(uint8_t ir_pin)
     : ir_pin_(ir_pin)
+    , index_(17)
     , remote_(ir_pin_)
     {
-        pinMode(ir_pin_, INPUT);
         remote_.enableIRIn(); // Включаем получение данных от пульта
     }
 
@@ -12,20 +12,29 @@ Remote::Remote(uint8_t ir_pin)
 
 void Remote::update() {
     // Получаем данные от пульта
-    if (millis() - timer_ > 1000) {
-
+    if (millis() - timer_ > 500) {
+        
         if (remote_.decode(&results_)) { // Если данные от пульта получены
-            Serial.println(results_.value); 
-            remote_.resume(); // Получаем следующее значение
+            button_pressed_ = true;
+
+            Serial.println(results_.value);
+            // Задаем значения для кнопок пульта
+            if (index_ < 17) {
+                if (results_.decode_type) { // Если данные от пульта получены
+                    info_.info[index_] = results_.value;
+                    
+                    index_++;
+                }
+            }
+
+
+            remote_.enableIRIn(); // Получаем следующее значение
         }
 
-        // Задаем значения для кнопок пульта
-        if (index_ < 17) {
-            if (results_.decode_type) { // Если данные от пульта получены
-                index_++;
-                info_.info[index_] = results_.value;
-            }
-        }
+        else {
+            button_pressed_ = false;
+        }        
+
 
 
         timer_ = millis();
@@ -37,6 +46,17 @@ void Remote::update() {
 void Remote::setRemoteButtons(){ // Устанавливаем значения кнопкам пульта
     index_ = 0;
 }
+
+
+
+// bool Remote::isButtonPressed() {
+//     if (results_.bits > 0) {
+//         return true;
+//     }
+//     else {
+//         return false;
+//     }
+// }
 
 
 

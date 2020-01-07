@@ -35,7 +35,7 @@ class Remote{
         
         void update();
         void setRemoteButtons();
-        bool isInfoGot(){return results_.decode_type;}
+        bool isButtonPressed() {return button_pressed_;}
         bool isButtOne();
         bool isButtTwo();
         bool isButtThree();
@@ -57,6 +57,7 @@ class Remote{
     private:
         uint8_t ir_pin_;
         uint8_t index_;
+        bool button_pressed_;
 
         unsigned long timer_;
 

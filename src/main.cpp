@@ -15,6 +15,8 @@ PCInfo info;
 MainMode main_mode = msmLights;
 
 uint8_t remote_index = 0;
+bool remote_buttons;
+bool is_remote_buttons_pressed;
 
 uint8_t bright = BRIGHT;
 
@@ -29,6 +31,7 @@ String string_convert;
 
 
 // TODO: Добавить константы 
+// TODO: Добавить пропуск первого значения от пульта
 
 
 
@@ -92,12 +95,22 @@ void loop() {
   leds.update(info.info.cpu_temp, info.info.gpu_temp);
   fan.update(info.info.cpu_temp, info.info.gpu_temp);
   remote.update();
+  if (!remote_buttons) {
+    remote_buttons = true;
+    remote.setRemoteButtons();
+  }
+
+
   if (millis() - timer_info > 2000) {
     parse(&info);
+    if (is_remote_buttons_pressed) {
+      sendData(info);
+      is_remote_buttons_pressed = false;
+    }
     timer_info = millis();
   }
-  if (remote.isInfoGot()) {
-    sendData(info);
+  if (remote.isButtonPressed()) {
+    is_remote_buttons_pressed = true;
   }
   
 }
