@@ -15,6 +15,7 @@ Lights::Lights(uint8_t red_pin, uint8_t green_pin, uint8_t blue_pin)
     }
 
 
+
 void Lights::update(uint8_t cpu_temp, uint8_t gpu_temp){
     cpu_temp_ = cpu_temp;
     gpu_temp_ = gpu_temp;

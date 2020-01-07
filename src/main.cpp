@@ -17,8 +17,6 @@ RemoteInfo remote_info;
 uint8_t remote_index = 0;
 
 uint8_t bright = BRIGHT;
-bool is_select = false;
-bool is_curs = false;
 
 unsigned long timer_info;
 unsigned long timer_ir;

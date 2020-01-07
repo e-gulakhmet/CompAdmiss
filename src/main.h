@@ -57,29 +57,6 @@ typedef union {
   byte data[16];
 } PCInfo;
 
-typedef struct {
-  unsigned long one;
-  unsigned long two;
-  unsigned long three;
-  unsigned long four;
-  unsigned long five;
-  unsigned long six;
-  unsigned long seven;
-  unsigned long eight;
-  unsigned long nine;
-  unsigned long star;
-  unsigned long zero;
-  unsigned long grid;
-  unsigned long up;
-  unsigned long left;
-  unsigned long ok;
-  unsigned long right;
-  unsigned long down; 
-} RemoteButt;
 
-typedef union {
-  RemoteButt butt;
-  unsigned long info[17];
-} RemoteInfo;
 
 #endif // _MAIN_H_
