@@ -36,7 +36,8 @@ typedef struct {
   uint8_t cpu_temp;
   uint8_t gpu_temp;
   uint8_t fan_mode;
-  uint8_t fan_step_temp;
+  uint8_t fan_cpu_step_temp;
+  uint8_t fan_gpu_step_temp;
   uint8_t lights_mode;
   uint8_t lights_bright;
   uint8_t ram_use;
@@ -49,7 +50,6 @@ typedef struct {
   uint8_t color_manual;
   uint8_t fan_ctrl;
   uint8_t color_ctrl; 
-  uint8_t bright_ctrl;
 } OHMInfo;
 
 typedef union {
