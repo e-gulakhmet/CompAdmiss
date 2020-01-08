@@ -95,11 +95,6 @@ void loop() {
   leds.update(info.info.cpu_temp, info.info.gpu_temp);
   fan.update(info.info.cpu_temp, info.info.gpu_temp);
   remote.update();
-  if (!remote_buttons) {
-    remote_buttons = true;
-    remote.setRemoteButtons();
-  }
-
 
   if (millis() - timer_info > 2000) {
     parse(&info);
@@ -109,6 +104,7 @@ void loop() {
     }
     timer_info = millis();
   }
+  
   if (remote.isButtonPressed()) {
     is_remote_buttons_pressed = true;
   }
