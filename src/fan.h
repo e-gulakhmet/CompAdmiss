@@ -25,10 +25,11 @@ class Fan {
         void on();
         void autoMode();
         void off();
+        void setMode(uint8_t index);
         void nextMode();
         void prevMode();
-        void setSpeed();
         String getModeName();
+        void setStepTemp(uint8_t cpu_temp, uint8_t gpu_temp);
         int getSpeed() {return fan_speed_;}
         
     
@@ -38,6 +39,8 @@ class Fan {
         uint8_t fan_speed_;  // Скорость вентилятора 
         uint8_t cpu_temp_;   // Температура процессора
         uint8_t gpu_temp_;   // Температура видеокарты
+        uint8_t cpu_step_temp_;
+        uint8_t gpu_step_temp_;
 
         unsigned long fan_timer_;
 

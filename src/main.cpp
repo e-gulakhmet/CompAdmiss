@@ -85,6 +85,7 @@ MainMode switchMainMode(MainMode curr, bool clockwice) { // Переключен
 }
 
 
+
 void setup(){
   Serial.begin(9600);
 }
@@ -98,15 +99,16 @@ void loop() {
 
   if (millis() - timer_info > 2000) {
     parse(&info);
-    if (is_remote_buttons_pressed) {
-      sendData(info);
-      is_remote_buttons_pressed = false;
+    if (is_remote_buttons_pressed) { // Если кнопка пульта была нажата
+      sendData(info); // Отправляем данные в порт
+      is_remote_buttons_pressed = false; 
+
     }
     timer_info = millis();
   }
-  
+
   if (remote.isButtonPressed()) {
     is_remote_buttons_pressed = true;
   }
-  
+
 }
