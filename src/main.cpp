@@ -62,7 +62,7 @@ void parse(PCInfo *info) {
 
 
 void sendData(PCInfo info) {
-  String str = String("F:") + info.info.fan_mode + ',' + info.info.fan_step_temp 
+  String str = String("F:") + info.info.fan_mode + ',' + info.info.fan_cpu_step_temp + ',' + info.info.fan_gpu_step_temp
              + String(";L:") + info.info.lights_mode + ',' + info.info.lights_bright + ';';
   // Отправляем данные вентилятора
   Serial.print(str);
@@ -88,6 +88,7 @@ MainMode switchMainMode(MainMode curr, bool clockwice) { // Переключен
 
 void setup(){
   Serial.begin(9600);
+  
 }
 
 
@@ -111,4 +112,10 @@ void loop() {
     is_remote_buttons_pressed = true;
   }
 
+
+  fan.setMode(info.info.fan_mode);
+  fan.setStepTemp(info.info.fan_cpu_step_temp, info.info.fan_gpu_step_temp);
+
+  leds.setMode(info.info.lights_mode);
+  leds.setBrightness(info.info.lights_bright);
 }
