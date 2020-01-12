@@ -12,11 +12,6 @@ const uint8_t FAN_PIN = 11;  // Пин вентилятора
 const uint8_t TX_PIN = 11;
 const uint8_t RX_PIN = 12;
 
-const uint8_t ENC_A = 2;     // пин энкодера
-const uint8_t ENC_B = 3;     // пин энкодера
-const uint8_t ENC_TYPE = 1;  // тип энкодера, 0 или 1
-const uint8_t BUTT_PIN = 7;  // пин кнопки
-
 const uint8_t BRIGHT = 200; // Стандартная яркость
 
 const uint8_t REMOTE_PIN = A0; // Пин ик приемника
@@ -40,21 +35,11 @@ typedef struct {
   uint8_t fan_gpu_step_temp;
   uint8_t lights_mode;
   uint8_t lights_bright;
-  uint8_t ram_use;
-  uint8_t gpu_mem_use;
-  uint8_t fan_max;
-  uint8_t fan_min;
-  uint8_t temp_max;
-  uint8_t temp_min;
-  uint8_t fan_manual;
-  uint8_t color_manual;
-  uint8_t fan_ctrl;
-  uint8_t color_ctrl; 
 } OHMInfo;
 
 typedef union {
   OHMInfo info;
-  byte data[16];
+  byte data[6];
 } PCInfo;
 
 

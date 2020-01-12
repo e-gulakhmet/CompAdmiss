@@ -5,8 +5,8 @@
 Fan::Fan(uint8_t fan_pin)
     : fan_pin_(fan_pin)
     , fan_speed_(0)
-    , cpu_step_temp_(50)
-    , gpu_step_temp_(45)
+    , cpu_step_temp_(60)
+    , gpu_step_temp_(55)
     , fan_mode_(fmAuto)
     {
         pinMode(fan_pin_, OUTPUT);
@@ -36,7 +36,7 @@ void Fan::update(uint8_t cpu_temp, uint8_t gpu_temp) {
             }
 
             // Если температура не равно 0, то измеряем температуру       
-            if (millis() - fan_timer_ > 5000) { // Измеряем температуру, каждые 5 секунд.
+            if (millis() - fan_timer_ > 2000) { // Измеряем температуру, каждые 2 секунд.
                 fan_timer_ = millis();
                 // Выбираем режим
                 if (cpu_temp_ > cpu_step_temp_ || gpu_temp_ > gpu_step_temp_) {

@@ -101,7 +101,7 @@ void loop() {
   if (millis() - timer_info > 2000) {
     parse(&info);
     if (is_remote_buttons_pressed) { // Если кнопка пульта была нажата
-      sendData(info); // Отправляем данные в порт
+      //sendData(info); // Отправляем данные в порт
       is_remote_buttons_pressed = false; 
 
     }
