@@ -33,6 +33,7 @@ typedef struct {
   uint8_t fan_mode;
   uint8_t fan_cpu_step_temp;
   uint8_t fan_gpu_step_temp;
+  uint8_t lights_main_mode;
   uint8_t lights_mode;
   uint8_t lights_bright;
 } OHMInfo;
