@@ -31,10 +31,7 @@ String string_convert;
 
 
 // TODO: Добавить константы 
-// TODO: Добавить пропуск первого значения от пульта
 // TODO: Добавить режим подсветки с выбором одного цвета
-// TODO: Добавить включение или отключение подсветки
-
 
 
 // Получение информации от компьютера и сохранение ее в управляющей структуре
@@ -119,5 +116,11 @@ void loop() {
   fan.setStepTemp(info.info.fan_cpu_step_temp, info.info.fan_gpu_step_temp);
 
   leds.setMode(info.info.lights_mode);
+  if (info.info.lights_main_mode == 0) {
+    leds.off();
+  }
+  else if (info.info.lights_main_mode == 1){
+    leds.on();
+  }
   leds.setBrightness(info.info.lights_bright);
 }
