@@ -8,6 +8,7 @@ Lights::Lights(uint8_t red_pin, uint8_t green_pin, uint8_t blue_pin)
     , red_(0)
     , green_(0)
     , blue_(0)
+    , speed_(50)
     , lights_mode_(lmColor)
     , leds_(red_pin_, green_pin_, blue_pin_)
     {
@@ -19,12 +20,13 @@ Lights::Lights(uint8_t red_pin, uint8_t green_pin, uint8_t blue_pin)
 void Lights::update(uint8_t cpu_temp, uint8_t gpu_temp){
     cpu_temp_ = cpu_temp;
     gpu_temp_ = gpu_temp;
+    static unsigned long am_timer;
 
     // Оповещение о высокой температуре
     if (cpu_temp_ >= 90 || gpu_temp_ >= 85){ // Если температура больше максимальной
-        if (millis() - am_timer_ > 500){ // Моргаем красным цветом.
+        if (millis() - am_timer > 500){ // Моргаем красным цветом.
             is_alarm_timer_ = !is_alarm_timer_;
-            am_timer_ = millis();
+            am_timer = millis();
         }
         if (is_alarm_timer_){
             leds_.setHEX(BLACK);
@@ -72,14 +74,16 @@ void Lights::update(uint8_t cpu_temp, uint8_t gpu_temp){
                 break;
             
             case lmRainbow: // Режим радуги
-                if (millis() - rainbow_timer_ > 10) { 
-                    rainbow_timer_ = millis();
-                    hsvColor_++;
-                    if (hsvColor_ >= 255) {
-                    hsvColor_ = 0;
+                static unsigned long rainbow_timer;
+                static uint8_t hsv_color;
+                if (millis() - rainbow_timer > speed_) { 
+                    rainbow_timer = millis();
+                    hsv_color++;
+                    if (hsv_color >= 255) {
+                    hsv_color = 0;
                     }
                 }
-                leds_.setHSV(hsvColor_, 255, 255);
+                leds_.setHSV(hsv_color, 255, 255);
                 break;
 
             case lmKelvin: // Режим отображения цвета температуры в кельвинах
@@ -92,33 +96,10 @@ void Lights::update(uint8_t cpu_temp, uint8_t gpu_temp){
                 break;
         }
     }
+    else {
+        leds_.setHEX(BLACK);
+    }
 }
-
-
-
-void Lights::off() { 
-    is_on_ = false;
-    leds_.setHEX(BLACK);
-}
-
-
-
-void Lights::on() { 
-    is_on_ = true;
-}
-
-
-
-void Lights::setBrightness(uint8_t bright) {
-    leds_.setBrightness(bright);
-}
-
-
-
-String Lights::getModeName() { 
-    return mode_name_[lights_mode_];
-}
-
 
 
 void Lights::nextMode() {
@@ -128,8 +109,6 @@ void Lights::nextMode() {
         case lmKelvin: break;
     }
 }
-
-
 
 void Lights::prevMode() {
     switch(lights_mode_) {

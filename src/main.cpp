@@ -1,22 +1,15 @@
 #include <Arduino.h>
 #include <OneButton.h>
-#include <IRremote.h>
 
 #include "main.h"
 #include "fan.h"
 #include "lights.h"
-#include "remote.h"
 
 Fan fan(FAN_PIN);
 Lights leds(RED_PIN, GREEN_PIN, BLUE_PIN);
-Remote remote(REMOTE_PIN);
 
 PCInfo info;
 MainMode main_mode = msmLights;
-
-uint8_t remote_index = 0;
-bool remote_buttons;
-bool is_remote_buttons_pressed;
 
 uint8_t bright = BRIGHT;
 
@@ -32,6 +25,7 @@ String string_convert;
 
 // TODO: Добавить константы 
 // TODO: Добавить режим подсветки с выбором одного цвета
+// TODO: Добавить настройку скорости режимов
 
 
 // Получение информации от компьютера и сохранение ее в управляющей структуре
@@ -95,32 +89,24 @@ void setup(){
 void loop() {
   leds.update(info.info.cpu_temp, info.info.gpu_temp);
   fan.update(info.info.cpu_temp, info.info.gpu_temp);
-  remote.update();
 
   if (millis() - timer_info > 2000) {
     parse(&info);
-    if (is_remote_buttons_pressed) { // Если кнопка пульта была нажата
-      //sendData(info); // Отправляем данные в порт
-      is_remote_buttons_pressed = false; 
-
-    }
     timer_info = millis();
   }
-
-  if (remote.isButtonPressed()) {
-    is_remote_buttons_pressed = true;
-  }
-
 
   fan.setMode(info.info.fan_mode);
   fan.setStepTemp(info.info.fan_cpu_step_temp, info.info.fan_gpu_step_temp);
 
-  leds.setMode(info.info.lights_mode);
+
   if (info.info.lights_main_mode == 0) {
     leds.off();
   }
   else if (info.info.lights_main_mode == 1){
     leds.on();
   }
+  leds.setMode(info.info.lights_mode);
   leds.setBrightness(info.info.lights_bright);
+  leds.setSpeed(info.info.lights_speed);
+  
 }
