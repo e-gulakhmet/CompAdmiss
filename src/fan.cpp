@@ -73,16 +73,6 @@ void Fan::autoMode() {
 
 
 
-void Fan::setMode(uint8_t index) {
-    if (index > fmAuto) {
-        // Ругнуться
-        return;
-    }
-    fan_mode_ = static_cast<FanMode>(index);
-}
-
-
-
 String Fan::getModeName() {
     return get_mode_name_[fan_mode_];
 }

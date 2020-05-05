@@ -102,6 +102,7 @@ void Lights::update(uint8_t cpu_temp, uint8_t gpu_temp){
 }
 
 
+
 void Lights::nextMode() {
     switch(lights_mode_) {
         case lmColor: lights_mode_ = lmRainbow; break;
@@ -116,14 +117,4 @@ void Lights::prevMode() {
         case lmRainbow: lights_mode_ = lmColor; break;
         case lmKelvin: lights_mode_ = lmRainbow; break;
     }
-}
-
-
-
-void Lights::setMode(uint8_t index) {
-    if (index > lmKelvin) {
-        // Ругнуться
-        return;
-    }
-    lights_mode_ = static_cast<LightsMode>(index);
 }

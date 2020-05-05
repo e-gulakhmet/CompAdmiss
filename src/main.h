@@ -16,17 +16,6 @@ const uint8_t BRIGHT = 200; // Стандартная яркость
 
 const uint8_t REMOTE_PIN = A0; // Пин ик приемника
 
-typedef enum {
-  mMain,
-  mSetting
-} Mode;
-
-typedef enum {
-  msmLights = 0,
-  msmBright,
-  msmFan
-} MainMode;
-
 typedef struct {
   uint8_t cpu_temp;
   uint8_t gpu_temp;

@@ -29,12 +29,11 @@ class Lights {
         } LightsMode;
         
         void update(uint8_t cpu_temp, uint8_t gpu_temp);
-        void off() {is_on_ = false;}; // Выключение ленты
-        void on() {is_on_ = true;}; // Включение ленты
+        void set_on(bool state) {is_on_ = state;};
         void setBrightness(uint8_t bright) {leds_.setBrightness(bright);};
         void nextMode();
         void prevMode();
-        void setMode(uint8_t index);
+        void setMode(LightsMode mode) {lights_mode_ = mode;};
         void setSpeed(uint8_t speed) {speed_ = speed;};
         //String getTempMode(); // Получение режим температуры
         String getModeName() {return mode_name_[lights_mode_];}; // Получение режима подцветки

@@ -9,18 +9,10 @@ Fan fan(FAN_PIN);
 Lights leds(RED_PIN, GREEN_PIN, BLUE_PIN);
 
 PCInfo info;
-MainMode main_mode = msmLights;
 
-uint8_t bright = BRIGHT;
-
+bool is_connect = false;
 unsigned long timer_info;
-unsigned long timer_ir;
-
-// парсинг
-char inData[82];       // массив входных значений (СИМВОЛЫ)
-byte index = 0;
-String string_convert;
-
+char inData[82]; // массив входных значений (СИМВОЛЫ)
 
 
 // TODO: Добавить константы 
@@ -30,7 +22,9 @@ String string_convert;
 
 // Получение информации от компьютера и сохранение ее в управляющей структуре
 void parse(PCInfo *info) {
-  while (Serial.available() > 0) {
+  static String string_convert;
+  static byte index = 0;
+  if (Serial.available() > 0) {
     char aChar = Serial.read();
     if (aChar != 'E') {
       inData[index] = aChar;
@@ -48,8 +42,11 @@ void parse(PCInfo *info) {
         index++;
       }
       index = 0;
+      is_connect = true;
     }
   }
+  else
+    is_connect = false;
 }
 
 
@@ -63,25 +60,8 @@ void sendData(PCInfo info) {
 
 
 
-MainMode switchMainMode(MainMode curr, bool clockwice) { // Переключение режимов
-  int n = static_cast<int>(curr);
-
-  n += clockwice ? 1 : -1; // Если по часовой стрелке, то ставим следующий
-
-  if ( n > 2) {
-    n = 2;
-  }
-  if ( n < 0 ) {
-    n = 0;
-  }
-  return static_cast<MainMode>(n);
-}
-
-
-
 void setup(){
   Serial.begin(9600);
-  
 }
 
 
@@ -95,18 +75,17 @@ void loop() {
     timer_info = millis();
   }
 
-  fan.setMode(info.info.fan_mode);
-  fan.setStepTemp(info.info.fan_cpu_step_temp, info.info.fan_gpu_step_temp);
-
-
-  if (info.info.lights_main_mode == 0) {
-    leds.off();
+  if (is_connect) {
+    fan.setMode(static_cast<Fan::FanMode>(info.info.fan_mode));
+    fan.setStepTemp(info.info.fan_cpu_step_temp, info.info.fan_gpu_step_temp);
+    leds.set_on(info.info.lights_main_mode);
+    leds.setMode(static_cast<Lights::LightsMode>(info.info.lights_mode));
+    leds.setBrightness(info.info.lights_bright);
+    leds.setSpeed(info.info.lights_speed);
   }
-  else if (info.info.lights_main_mode == 1){
-    leds.on();
+
+  else {
+    fan.setMode(Fan::fmOn);
+    leds.setMode(Lights::lmRainbow);
   }
-  leds.setMode(info.info.lights_mode);
-  leds.setBrightness(info.info.lights_bright);
-  leds.setSpeed(info.info.lights_speed);
-  
 }

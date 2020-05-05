@@ -25,7 +25,7 @@ class Fan {
         void on();
         void autoMode();
         void off();
-        void setMode(uint8_t index);
+        void setMode(FanMode mode) {fan_mode_ = mode;};
         void nextMode();
         void prevMode();
         String getModeName();
