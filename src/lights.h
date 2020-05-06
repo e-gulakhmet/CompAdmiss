@@ -28,29 +28,29 @@ class Lights {
         } EffectMode;
         
         void begin(); // Инициализация
-        void update(); // Функция в которой происходит обработка всех действий
-        void setOn(bool state); // Включение или выключение подсветки
-        void setEffect(EffectMode mode); // Установка режима подсветки
-        void setBrightness(uint8_t bright); // Установка яркости
-        void setEffectColor(uint8_t index); // Установка цвета для режимов(oneColor)
-        void setEffectSpeed(int speed); // Установка скорости эффектов
+        void update(uint8_t cpu_temp, uint8_t gpu_temp); // Функция в которой происходит обработка всех действий
+        void setOn(bool state) {is_on_ = state;}; // Включение или выключение подсветки
+        void setEffect(EffectMode mode) {mode_ = mode;}; // Установка режима подсветки
+        void setBrightness(uint8_t bright) {leds_.setBrightness(bright);}; // Установка яркости
+        void setEffectSpeed(int speed) {speed_ = speed;}; // Установка скорости эффектов
         void PulseOneColor();
         void rgbProp();
         void rainbow();
         void randomColor();
+        void oneColor(uint32_t color);
+        void adaptTemp();
 
     private:
         uint8_t data_pin_;
         uint8_t num_leds_;
 
-        bool is_on;
-        bool is_updated;
-        uint8_t brightness_;
-        uint8_t color_index_;
+        uint8_t cpu_temp_;
+        uint8_t gpu_temp_;
+
+        bool is_on_;
         int speed_;
         unsigned long timer;
         uint8_t thishue;
-        uint8_t thissat;
 
         const uint32_t color_pallete_[13] = {
             leds_.Color(255, 0, 0),
