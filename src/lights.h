@@ -2,7 +2,7 @@
 #define _LIGHTS_H_
 
 #include <Arduino.h>
-#include <GyverRGB.h>
+#include <Adafruit_NeoPixel.h>
 
 /*
     Класс подсветки, следит за температурой и нагрузкой видеокарты и процессора.
@@ -20,44 +20,59 @@
 
 class Lights {
     public: 
-        Lights(uint8_t red_pin, uint8_t green_pin, uint8_t blue_pin);
+        Lights(uint8_t data_pin, uint8_t num_leds);
 
-        typedef enum { // Режимы подсветки
-            lmColor, // Переключение цветов
-            lmRainbow, // Радуга
-            lmKelvin // Температура
-        } LightsMode;
+        typedef enum {
+            emOneColor = 0, // Один цвет
+            emRainbow, // Радуга
+        } EffectMode;
         
-        void update(uint8_t cpu_temp, uint8_t gpu_temp);
-        void set_on(bool state) {is_on_ = state;};
-        void setBrightness(uint8_t bright) {leds_.setBrightness(bright);};
-        void nextMode();
-        void prevMode();
-        void setMode(LightsMode mode) {lights_mode_ = mode;};
-        void setSpeed(uint8_t speed) {speed_ = speed;};
-        //String getTempMode(); // Получение режим температуры
-        String getModeName() {return mode_name_[lights_mode_];}; // Получение режима подцветки
+        void begin(); // Инициализация
+        void update(); // Функция в которой происходит обработка всех действий
+        void setOn(bool state); // Включение или выключение подсветки
+        void setEffect(EffectMode mode); // Установка режима подсветки
+        void setBrightness(uint8_t bright); // Установка яркости
+        void setEffectColor(uint8_t index); // Установка цвета для режимов(oneColor)
+        void setEffectSpeed(int speed); // Установка скорости эффектов
+        void PulseOneColor();
+        void rgbProp();
+        void rainbow();
+        void randomColor();
 
     private:
-        uint8_t red_pin_;
-        uint8_t green_pin_;
-        uint8_t blue_pin_;
+        uint8_t data_pin_;
+        uint8_t num_leds_;
 
-        uint8_t cpu_temp_;
-        uint8_t gpu_temp_;
-        
-        bool is_on_;
-        bool is_alarm_timer_;
-        uint8_t hsvColor_;
-        uint8_t red_;
-        uint8_t green_;
-        uint8_t blue_;
-        uint8_t speed_;
+        bool is_on;
+        bool is_updated;
+        uint8_t brightness_;
+        uint8_t color_index_;
+        int speed_;
+        unsigned long timer;
+        uint8_t thishue;
+        uint8_t thissat;
 
-        String mode_name_[3] = {"Color", "Rainbow", "Kelvin"};
+        const uint32_t color_pallete_[13] = {
+            leds_.Color(255, 0, 0),
+            leds_.Color(255, 0, 255),
+            leds_.Color(128, 0, 128),
+            leds_.Color(86, 0, 111),
+            leds_.Color(2, 0, 111),
+            leds_.Color(0, 100, 255),
+            leds_.Color(0, 128, 128),
+            leds_.Color(0, 128, 0),
+            leds_.Color(0, 255, 15),
+            leds_.Color(251, 255, 0),
+            leds_.Color(255, 173, 0),
+            leds_.Color(255, 87, 0),
+            leds_.Color(0, 243, 255)
+        };
 
-        LightsMode lights_mode_; // Основные режимы работы подсветки
-        GRGB leds_;
+        EffectMode mode_;
+        Adafruit_NeoPixel leds_;
+
+        bool safeDelay(int del_time);
+        int antipodal_index(int i);
 };
 
 

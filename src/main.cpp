@@ -1,12 +1,11 @@
 #include <Arduino.h>
-#include <OneButton.h>
 
 #include "main.h"
 #include "fan.h"
 #include "lights.h"
 
 Fan fan(FAN_PIN);
-Lights leds(RED_PIN, GREEN_PIN, BLUE_PIN);
+Lights leds(2, 60);
 
 PCInfo info;
 
@@ -15,9 +14,7 @@ unsigned long timer_info;
 char inData[82]; // массив входных значений (СИМВОЛЫ)
 
 
-// TODO: Добавить константы 
-// TODO: Добавить режим подсветки с выбором одного цвета
-// TODO: Добавить настройку скорости режимов
+// TODO: Изменить подсветку на адресную
 
 
 // Получение информации от компьютера и сохранение ее в управляющей структуре
@@ -62,12 +59,13 @@ void sendData(PCInfo info) {
 
 void setup(){
   Serial.begin(9600);
+  leds.begin();
 }
 
 
 
 void loop() {
-  leds.update(info.info.cpu_temp, info.info.gpu_temp);
+  // leds.update(info.info.cpu_temp, info.info.gpu_temp);
   fan.update(info.info.cpu_temp, info.info.gpu_temp);
 
   if (millis() - timer_info > 2000) {
@@ -78,14 +76,14 @@ void loop() {
   if (is_connect) {
     fan.setMode(static_cast<Fan::FanMode>(info.info.fan_mode));
     fan.setStepTemp(info.info.fan_cpu_step_temp, info.info.fan_gpu_step_temp);
-    leds.set_on(info.info.lights_main_mode);
-    leds.setMode(static_cast<Lights::LightsMode>(info.info.lights_mode));
-    leds.setBrightness(info.info.lights_bright);
-    leds.setSpeed(info.info.lights_speed);
+    // leds.set_on(info.info.lights_main_mode);
+    // leds.setMode(static_cast<Lights::LightsMode>(info.info.lights_mode));
+    // leds.setBrightness(info.info.lights_bright);
+    // leds.setSpeed(info.info.lights_speed);
   }
 
   else {
     fan.setMode(Fan::fmOn);
-    leds.setMode(Lights::lmRainbow);
+    //leds.setMode(Lights::lmRainbow);
   }
 }
