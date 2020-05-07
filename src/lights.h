@@ -23,8 +23,12 @@ class Lights {
         Lights(uint8_t data_pin, uint8_t num_leds);
 
         typedef enum {
-            emOneColor = 0, // Один цвет
-            emRainbow, // Радуга
+            emAdaptTemp, // Один цвет
+            emOneColor, // Радуга
+            emRandomColor,
+            emPulseOneColor,
+            emRgbPropeller,
+            emRainbow
         } EffectMode;
         
         void begin(); // Инициализация
@@ -49,7 +53,6 @@ class Lights {
 
         bool is_on_;
         int speed_;
-        unsigned long timer;
         uint8_t thishue;
 
         const uint32_t color_pallete_[13] = {

@@ -42,7 +42,29 @@ void Lights::update(uint8_t cpu_temp, uint8_t gpu_temp) {
 
     if (is_on_) { // Если подсветка включена
         switch (mode_) {
+            case emAdaptTemp:
+                adaptTemp();
+                break;
 
+            case emOneColor:
+                oneColor(leds_.ColorHSV(thishue, 255, 255));
+                break;
+            
+            case emRandomColor:
+                randomColor();
+                break;
+            
+            case emPulseOneColor:
+                PulseOneColor();
+                break;
+            
+            case emRgbPropeller:
+                rgbProp();
+                break;
+
+            case emRainbow:
+                rainbow();
+                break;
         }
     }
     else {
@@ -52,6 +74,7 @@ void Lights::update(uint8_t cpu_temp, uint8_t gpu_temp) {
 }
 
 bool Lights::safeDelay(int del_time) {
+    static unsigned long timer;
     if (millis() - timer < del_time)
         return true;
 
@@ -155,6 +178,30 @@ void Lights::oneColor(uint32_t color) {
 }
 
 void Lights::adaptTemp() {
+    static uint8_t old_cpu_temp;
+    static uint8_t old_gpu_temp;
+
+    if (safeDelay(speed_))
+        return;
+
     
+    if (cpu_temp_ >= gpu_temp_) {
+        if (old_cpu_temp != cpu_temp_) {
+            if (old_cpu_temp < cpu_temp_)
+                old_cpu_temp++;
+            else if (old_cpu_temp > cpu_temp_)
+                old_cpu_temp--;
+            oneColor(leds_.ColorHSV(map(gpu_temp_, 30, 80, 0, 65500)));
+        }
+    }
+    else if (gpu_temp_ > cpu_temp_) {
+        if (old_gpu_temp != gpu_temp_){
+            if (old_gpu_temp < gpu_temp_)
+                old_gpu_temp++;
+            else if (old_gpu_temp > gpu_temp_)
+                old_gpu_temp--;
+            oneColor(leds_.ColorHSV(map(gpu_temp_, 30, 80, 0, 65500)));
+        }      
+    }
 }
 

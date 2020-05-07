@@ -65,7 +65,7 @@ void setup(){
 
 
 void loop() {
-  // leds.update(info.info.cpu_temp, info.info.gpu_temp);
+  leds.update(info.info.cpu_temp, info.info.gpu_temp);
   fan.update(info.info.cpu_temp, info.info.gpu_temp);
 
   if (millis() - timer_info > 2000) {
@@ -76,14 +76,14 @@ void loop() {
   if (is_connect) {
     fan.setMode(static_cast<Fan::FanMode>(info.info.fan_mode));
     fan.setStepTemp(info.info.fan_cpu_step_temp, info.info.fan_gpu_step_temp);
-    // leds.set_on(info.info.lights_main_mode);
-    // leds.setMode(static_cast<Lights::LightsMode>(info.info.lights_mode));
-    // leds.setBrightness(info.info.lights_bright);
-    // leds.setSpeed(info.info.lights_speed);
+    leds.setOn(info.info.lights_main_mode);
+    leds.setEffect(static_cast<Lights::EffectMode>(info.info.lights_mode));
+    leds.setBrightness(info.info.lights_bright);
+    leds.setEffectSpeed(info.info.lights_speed);
   }
 
   else {
     fan.setMode(Fan::fmOn);
-    //leds.setMode(Lights::lmRainbow);
+    leds.setEffect(Lights::emRainbow);
   }
 }
