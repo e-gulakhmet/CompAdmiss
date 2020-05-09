@@ -7,8 +7,8 @@ Lights::Lights(uint8_t data_pin, uint8_t num_leds)
     , num_leds_(num_leds)
     , is_on_(true)
     , speed_(30)
-    , thishue(0)
-    , mode_(emOneColor)
+    , color_(30000)
+    , mode_(emRgbPropeller)
     , leds_(Adafruit_NeoPixel(num_leds_, data_pin_, NEO_GRB + NEO_KHZ800))
     {
         leds_.setBrightness(200);
@@ -28,13 +28,14 @@ void Lights::update(uint8_t cpu_temp, uint8_t gpu_temp) {
     cpu_temp_ = cpu_temp;
     gpu_temp_ = gpu_temp;
     // Оповещение о высокой температуре
-    if (cpu_temp_ >= 90 || gpu_temp_ >= 85){ // Если температура больше максимальной
+    if ((cpu_temp_ >= 90 && cpu_temp_ <= 140) || (gpu_temp_ >= 80 && gpu_temp_ <= 140)) { // Если температура больше максимальной
         static unsigned long am_timer;
         static bool is_alarm_timer;
-        if (millis() - am_timer > 500){ // Моргаем красным цветом.
+        if (millis() - am_timer > 500) { // Моргаем красным цветом.
             is_alarm_timer = !is_alarm_timer;
             am_timer = millis();
-            oneColor(is_alarm_timer ? leds_.Color(255, 0, 0) : leds_.Color(0, 0, 0));
+            for (int i = 0; i < num_leds_; i++)
+                leds_.setPixelColor(i, (is_alarm_timer ? leds_.Color(255, 0, 0) : leds_.Color(0, 0, 0)));
         }
 
         return;
@@ -45,17 +46,13 @@ void Lights::update(uint8_t cpu_temp, uint8_t gpu_temp) {
             case emAdaptTemp:
                 adaptTemp();
                 break;
-
-            case emOneColor:
-                oneColor(leds_.ColorHSV(thishue, 255, 255));
-                break;
             
             case emRandomColor:
                 randomColor();
                 break;
             
             case emPulseOneColor:
-                PulseOneColor();
+                pulseOneColor();
                 break;
             
             case emRgbPropeller:
@@ -80,7 +77,6 @@ bool Lights::safeDelay(int del_time) {
 
     timer = millis();
     return false;
-
 }
 
 int Lights::antipodal_index(int i) {
@@ -93,7 +89,7 @@ int Lights::antipodal_index(int i) {
 
 
 
-void Lights::PulseOneColor() {              //-m10-PULSE BRIGHTNESS ON ALL LEDS TO ONE COLOR
+void Lights::pulseOneColor() {              //-m10-PULSE BRIGHTNESS ON ALL LEDS TO ONE COLOR
     static bool bouncedirection;
     static int ibright;
 
@@ -112,8 +108,8 @@ void Lights::PulseOneColor() {              //-m10-PULSE BRIGHTNESS ON ALL LEDS 
             bouncedirection = 0;
         }
     }
-    for (int idex = 0 ; idex < num_leds_; idex++ ) {
-        leds_.setPixelColor(idex, leds_.ColorHSV(thishue, 255, ibright));
+    for (int idex = 0 ; idex < num_leds_; idex++) {
+        leds_.setPixelColor(idex, leds_.ColorHSV(color_, 255, ibright));
     }
     leds_.show();
 }
@@ -125,8 +121,8 @@ void Lights::rgbProp() { //-m27-RGB PROPELLER
         return;
 
     idex++;
-    int ghue = (thishue + (int)(65536 / 3)) % 65536;
-    int bhue = (thishue + (int)(65536 / 2)) % 65536;
+    uint16_t ghue = (color_ + (int)(65536 / 3)) % 65536;
+    uint16_t bhue = (color_ + (int)(65536 / 2)) % 65536;
     int N3  = int(num_leds_ / 3);
     int N6  = int(num_leds_ / 6);
     int N12 = int(num_leds_ / 12);
@@ -134,7 +130,7 @@ void Lights::rgbProp() { //-m27-RGB PROPELLER
         int j0 = (idex + i + num_leds_ - N12) % num_leds_;
         int j1 = (j0 + N6) % num_leds_;
         int j2 = (j1 + N3) % num_leds_;
-        leds_.setPixelColor(j0, leds_.ColorHSV(thishue, 255, 255));
+        leds_.setPixelColor(j0, leds_.ColorHSV(color_, 255, 255));
         leds_.setPixelColor(j1, leds_.ColorHSV(ghue, 255, 255));
         leds_.setPixelColor(j2, leds_.ColorHSV(bhue, 255, 255));
     }
@@ -149,7 +145,7 @@ void Lights::rainbow() {
 
     ihue += 100;
 
-    if (ihue > 65536) {
+    if (ihue >= 65536) {
         ihue = 0;
     }
     for (int idex = 0 ; idex < num_leds_; idex++ ) {
@@ -160,7 +156,7 @@ void Lights::rainbow() {
 
 void Lights::randomColor() { //-m25-RANDOM COLOR POP
     static int idex;
-    static int ihue;
+    static uint16_t ihue;
 
     if (safeDelay(speed_))
         return;
@@ -173,37 +169,31 @@ void Lights::randomColor() { //-m25-RANDOM COLOR POP
     leds_.show();
 }
 
-void Lights::oneColor(uint32_t color) {
-    for (int i = 0; i < num_leds_; i++)
-        leds_.setPixelColor(i, color);
-    leds_.show();
-}
-
 void Lights::adaptTemp() {
-    static uint8_t old_cpu_temp;
-    static uint8_t old_gpu_temp;
+    // static uint8_t old_cpu_temp;
+    // static uint8_t old_gpu_temp;
 
-    if (safeDelay(speed_))
-        return;
+    // if (safeDelay(speed_))
+    //     return;
 
     
-    if (cpu_temp_ >= gpu_temp_) {
-        if (old_cpu_temp != cpu_temp_) {
-            if (old_cpu_temp < cpu_temp_)
-                old_cpu_temp++;
-            else if (old_cpu_temp > cpu_temp_)
-                old_cpu_temp--;
-            oneColor(leds_.ColorHSV(map(old_cpu_temp, 30, 80, 0, 65536)));
-        }
-    }
-    else if (gpu_temp_ > cpu_temp_) {
-        if (old_gpu_temp != gpu_temp_){
-            if (old_gpu_temp < gpu_temp_)
-                old_gpu_temp++;
-            else if (old_gpu_temp > gpu_temp_)
-                old_gpu_temp--;
-            oneColor(leds_.ColorHSV(map(old_gpu_temp, 30, 80, 0, 65536)));
-        }
-    }
+    // if (cpu_temp_ >= gpu_temp_) {
+    //     if (old_cpu_temp != cpu_temp_) {
+    //         if (old_cpu_temp < cpu_temp_)
+    //             old_cpu_temp++;
+    //         else if (old_cpu_temp > cpu_temp_)
+    //             old_cpu_temp--;
+    //         oneColor(leds_.ColorHSV(map(old_cpu_temp, 30, 80, 0, 65536), 255, 255));
+    //     }
+    // }
+    // else {
+    //     if (old_gpu_temp != gpu_temp_){
+    //         if (old_gpu_temp < gpu_temp_)
+    //             old_gpu_temp++;
+    //         else if (old_gpu_temp > gpu_temp_)
+    //             old_gpu_temp--;
+    //         oneColor(leds_.ColorHSV(map(old_gpu_temp, 30, 80, 0, 65536), 255, 255));
+    //     }
+    // }
 }
 

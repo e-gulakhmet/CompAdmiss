@@ -24,7 +24,6 @@ class Lights {
 
         typedef enum {
             emAdaptTemp, // Один цвет
-            emOneColor, // Радуга
             emRandomColor,
             emPulseOneColor,
             emRgbPropeller,
@@ -37,11 +36,11 @@ class Lights {
         void setEffect(EffectMode mode) {mode_ = mode;}; // Установка режима подсветки
         void setBrightness(uint8_t bright) {leds_.setBrightness(bright);}; // Установка яркости
         void setEffectSpeed(int speed) {speed_ = speed;}; // Установка скорости эффектов
-        void PulseOneColor();
+        void setEffectColor(uint16_t color) {color_index_ = color;};
+        void pulseOneColor();
         void rgbProp();
         void rainbow();
         void randomColor();
-        void oneColor(uint32_t color);
         void adaptTemp();
 
     private:
@@ -53,7 +52,8 @@ class Lights {
 
         bool is_on_;
         int speed_;
-        uint8_t thishue;
+        uint16_t color_;
+        uint8_t color_index_;
 
         const uint32_t color_pallete_[13] = {
             leds_.Color(255, 0, 0),

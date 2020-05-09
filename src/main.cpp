@@ -66,7 +66,7 @@ void loop() {
   fan.update(info.info.cpu_temp, info.info.gpu_temp);
 
 
-  if (millis() - timer_info > 2000) {
+  if (millis() - timer_info > 3000) {
     parse(&info);
     timer_info = millis();
   }
@@ -78,9 +78,10 @@ void loop() {
     leds.setEffect(static_cast<Lights::EffectMode>(info.info.lights_mode));
     leds.setBrightness(info.info.lights_bright);
     leds.setEffectSpeed(info.info.lights_speed);
+    leds.setEffectColor(info.info.light_color);
   }
   else {
     fan.setMode(Fan::fmOn);
-    leds.setEffect(Lights::emRainbow);
+    leds.setEffect(Lights::emRgbPropeller);
   }
 }

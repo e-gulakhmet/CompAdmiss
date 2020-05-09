@@ -21,11 +21,12 @@ typedef struct {
   uint8_t lights_mode;
   uint8_t lights_bright;
   uint8_t lights_speed;
+  uint8_t light_color;
 } OHMInfo;
 
 typedef union {
   OHMInfo info;
-  byte data[10];
+  byte data[11];
 } PCInfo;
 
 
