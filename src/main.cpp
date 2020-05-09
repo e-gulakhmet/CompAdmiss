@@ -14,6 +14,7 @@ unsigned long timer_info;
 char inData[82]; // массив входных значений (СИМВОЛЫ)
 
 
+
 // Получение информации от компьютера и сохранение ее в управляющей структуре
 void parse(PCInfo *info) {
   static String string_convert;
@@ -35,6 +36,7 @@ void parse(PCInfo *info) {
         info->data[index] = string_convert.toInt();
         index++;
       }
+      is_connect = true;
       index = 0;
     }
   }
@@ -54,6 +56,7 @@ void sendData(PCInfo info) {
 void setup(){
   Serial.begin(9600);
   leds.begin();
+  leds.setBrightness(BRIGHT);
 }
 
 
@@ -67,11 +70,17 @@ void loop() {
     parse(&info);
     timer_info = millis();
   }
-  
-  fan.setMode(static_cast<Fan::FanMode>(info.info.fan_mode));
-  fan.setStepTemp(info.info.fan_cpu_step_temp, info.info.fan_gpu_step_temp);
-  leds.setOn(info.info.lights_main_mode);
-  leds.setEffect(static_cast<Lights::EffectMode>(info.info.lights_mode));
-  leds.setBrightness(info.info.lights_bright);
-  leds.setEffectSpeed(info.info.lights_speed);
+
+  if (is_connect) {
+    fan.setMode(static_cast<Fan::FanMode>(info.info.fan_mode));
+    fan.setStepTemp(info.info.fan_cpu_step_temp, info.info.fan_gpu_step_temp);
+    leds.setOn(info.info.lights_main_mode);
+    leds.setEffect(static_cast<Lights::EffectMode>(info.info.lights_mode));
+    leds.setBrightness(info.info.lights_bright);
+    leds.setEffectSpeed(info.info.lights_speed);
+  }
+  else {
+    fan.setMode(Fan::fmOn);
+    leds.setEffect(Lights::emRainbow);
+  }
 }

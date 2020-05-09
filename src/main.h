@@ -9,7 +9,7 @@ const uint8_t NUM_LEDS = 77;   // Количество диодов
 const uint8_t FAN_PIN_1 = 5;  // Пин вентилятора
 const uint8_t FAN_PIN_2 = 6;  // Пин вентилятора
 
-const uint8_t BRIGHT = 200; // Стандартная яркость
+const uint8_t BRIGHT = 100; // Стандартная яркость
 
 typedef struct {
   uint8_t cpu_temp;
