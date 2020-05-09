@@ -3,18 +3,13 @@
 
 #include <Arduino.h>
 
-const uint8_t GREEN_PIN = 10; // Зеленый пин ленты
-const uint8_t RED_PIN = 9;   // Зеленый пин ленты
-const uint8_t BLUE_PIN = 6;  // Зеленый пин ленты
+const uint8_t LED_PIN = 3; // Пин ленты
+const uint8_t NUM_LEDS = 77;   // Количество диодов
 
-const uint8_t FAN_PIN = 11;  // Пин вентилятора
-
-const uint8_t TX_PIN = 11;
-const uint8_t RX_PIN = 12;
+const uint8_t FAN_PIN_1 = 5;  // Пин вентилятора
+const uint8_t FAN_PIN_2 = 6;  // Пин вентилятора
 
 const uint8_t BRIGHT = 200; // Стандартная яркость
-
-const uint8_t REMOTE_PIN = A0; // Пин ик приемника
 
 typedef struct {
   uint8_t cpu_temp;
@@ -30,7 +25,7 @@ typedef struct {
 
 typedef union {
   OHMInfo info;
-  byte data[9];
+  byte data[10];
 } PCInfo;
 
 

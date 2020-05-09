@@ -4,8 +4,8 @@
 #include "fan.h"
 #include "lights.h"
 
-Fan fan(FAN_PIN);
-Lights leds(2, 60);
+Fan fan(FAN_PIN_2);
+Lights leds(LED_PIN, NUM_LEDS);
 
 PCInfo info;
 
@@ -14,14 +14,11 @@ unsigned long timer_info;
 char inData[82]; // массив входных значений (СИМВОЛЫ)
 
 
-// TODO: Изменить подсветку на адресную
-
-
 // Получение информации от компьютера и сохранение ее в управляющей структуре
 void parse(PCInfo *info) {
   static String string_convert;
   static byte index = 0;
-  if (Serial.available() > 0) {
+  while (Serial.available() > 0) {
     char aChar = Serial.read();
     if (aChar != 'E') {
       inData[index] = aChar;
@@ -39,11 +36,8 @@ void parse(PCInfo *info) {
         index++;
       }
       index = 0;
-      is_connect = true;
     }
   }
-  else
-    is_connect = false;
 }
 
 
@@ -68,22 +62,16 @@ void loop() {
   leds.update(info.info.cpu_temp, info.info.gpu_temp);
   fan.update(info.info.cpu_temp, info.info.gpu_temp);
 
+
   if (millis() - timer_info > 2000) {
     parse(&info);
     timer_info = millis();
   }
-
-  if (is_connect) {
-    fan.setMode(static_cast<Fan::FanMode>(info.info.fan_mode));
-    fan.setStepTemp(info.info.fan_cpu_step_temp, info.info.fan_gpu_step_temp);
-    leds.setOn(info.info.lights_main_mode);
-    leds.setEffect(static_cast<Lights::EffectMode>(info.info.lights_mode));
-    leds.setBrightness(info.info.lights_bright);
-    leds.setEffectSpeed(info.info.lights_speed);
-  }
-
-  else {
-    fan.setMode(Fan::fmOn);
-    leds.setEffect(Lights::emRainbow);
-  }
+  
+  fan.setMode(static_cast<Fan::FanMode>(info.info.fan_mode));
+  fan.setStepTemp(info.info.fan_cpu_step_temp, info.info.fan_gpu_step_temp);
+  leds.setOn(info.info.lights_main_mode);
+  leds.setEffect(static_cast<Lights::EffectMode>(info.info.lights_mode));
+  leds.setBrightness(info.info.lights_bright);
+  leds.setEffectSpeed(info.info.lights_speed);
 }

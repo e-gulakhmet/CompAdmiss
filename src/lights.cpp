@@ -5,13 +5,13 @@
 Lights::Lights(uint8_t data_pin, uint8_t num_leds)
     : data_pin_(data_pin)
     , num_leds_(num_leds)
-    , is_on_(false)
-    , speed_(20)
+    , is_on_(true)
+    , speed_(30)
     , thishue(0)
     , mode_(emOneColor)
     , leds_(Adafruit_NeoPixel(num_leds_, data_pin_, NEO_GRB + NEO_KHZ800))
     {
-
+        leds_.setBrightness(200);
     }
 
 
@@ -125,15 +125,15 @@ void Lights::rgbProp() { //-m27-RGB PROPELLER
         return;
 
     idex++;
-    int ghue = (thishue + 80) % 255;
-    int bhue = (thishue + 160) % 255;
+    int ghue = (thishue + (int)(65536 / 3)) % 65536;
+    int bhue = (thishue + (int)(65536 / 2)) % 65536;
     int N3  = int(num_leds_ / 3);
     int N6  = int(num_leds_ / 6);
     int N12 = int(num_leds_ / 12);
     for (int i = 0; i < N3; i++ ) {
         int j0 = (idex + i + num_leds_ - N12) % num_leds_;
-        int j1 = (j0 + N3) % num_leds_;
-        int j2 = (j1 + N6) % num_leds_;
+        int j1 = (j0 + N6) % num_leds_;
+        int j2 = (j1 + N3) % num_leds_;
         leds_.setPixelColor(j0, leds_.ColorHSV(thishue, 255, 255));
         leds_.setPixelColor(j1, leds_.ColorHSV(ghue, 255, 255));
         leds_.setPixelColor(j2, leds_.ColorHSV(bhue, 255, 255));
@@ -146,13 +146,14 @@ void Lights::rainbow() {
 
     if (safeDelay(speed_))
         return;
-    
-    ihue += 500;
+
+    ihue += 100;
+
     if (ihue > 65536) {
         ihue = 0;
     }
-    for (int idex_ = 0 ; idex_ < num_leds_; idex_++ ) {
-        leds_.setPixelColor(idex_, leds_.ColorHSV(ihue, 255, 100));
+    for (int idex = 0 ; idex < num_leds_; idex++ ) {
+        leds_.setPixelColor(idex, leds_.ColorHSV(ihue, 255, 255));
     }
     leds_.show();
 }
@@ -165,7 +166,7 @@ void Lights::randomColor() { //-m25-RANDOM COLOR POP
         return;
 
     idex = random(0, num_leds_);
-    ihue = random(0, 255);
+    ihue = random(0, 65536);
     for (uint8_t i = 0; i < num_leds_; i++)
         leds_.setPixelColor(i, 0, 0, 0);
     leds_.setPixelColor(idex, leds_.ColorHSV(ihue, 255, 255));
@@ -175,6 +176,7 @@ void Lights::randomColor() { //-m25-RANDOM COLOR POP
 void Lights::oneColor(uint32_t color) {
     for (int i = 0; i < num_leds_; i++)
         leds_.setPixelColor(i, color);
+    leds_.show();
 }
 
 void Lights::adaptTemp() {
@@ -191,7 +193,7 @@ void Lights::adaptTemp() {
                 old_cpu_temp++;
             else if (old_cpu_temp > cpu_temp_)
                 old_cpu_temp--;
-            oneColor(leds_.ColorHSV(map(gpu_temp_, 30, 80, 0, 65500)));
+            oneColor(leds_.ColorHSV(map(old_cpu_temp, 30, 80, 0, 65536)));
         }
     }
     else if (gpu_temp_ > cpu_temp_) {
@@ -200,8 +202,8 @@ void Lights::adaptTemp() {
                 old_gpu_temp++;
             else if (old_gpu_temp > gpu_temp_)
                 old_gpu_temp--;
-            oneColor(leds_.ColorHSV(map(gpu_temp_, 30, 80, 0, 65500)));
-        }      
+            oneColor(leds_.ColorHSV(map(old_gpu_temp, 30, 80, 0, 65536)));
+        }
     }
 }
 
