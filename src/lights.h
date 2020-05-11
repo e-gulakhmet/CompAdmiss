@@ -52,7 +52,7 @@ class Lights {
 
         bool is_on_;
         int speed_;
-        uint16_t color_;
+        uint32_t color_;
         uint8_t color_index_;
 
         const uint32_t color_pallete_[13] = {

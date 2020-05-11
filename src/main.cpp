@@ -66,22 +66,21 @@ void loop() {
   fan.update(info.info.cpu_temp, info.info.gpu_temp);
 
 
-  if (millis() - timer_info > 3000) {
+  if (millis() - timer_info > 2000) {
     parse(&info);
     timer_info = millis();
-  }
-
-  if (is_connect) {
-    fan.setMode(static_cast<Fan::FanMode>(info.info.fan_mode));
-    fan.setStepTemp(info.info.fan_cpu_step_temp, info.info.fan_gpu_step_temp);
-    leds.setOn(info.info.lights_main_mode);
-    leds.setEffect(static_cast<Lights::EffectMode>(info.info.lights_mode));
-    leds.setBrightness(info.info.lights_bright);
-    leds.setEffectSpeed(info.info.lights_speed);
-    leds.setEffectColor(info.info.light_color);
-  }
-  else {
-    fan.setMode(Fan::fmOn);
-    leds.setEffect(Lights::emRgbPropeller);
+    if (is_connect) {
+      fan.setMode(static_cast<Fan::FanMode>(info.info.fan_mode));
+      fan.setStepTemp(info.info.fan_cpu_step_temp, info.info.fan_gpu_step_temp);
+      leds.setOn(info.info.lights_main_mode);
+      leds.setEffect(static_cast<Lights::EffectMode>(info.info.lights_mode));
+      leds.setBrightness(info.info.lights_bright);
+      leds.setEffectSpeed(info.info.lights_speed);
+      leds.setEffectColor(info.info.light_color);
+    }
+    else {
+      fan.setMode(Fan::fmOn);
+      leds.setEffect(Lights::emRgbPropeller);
+    }
   }
 }

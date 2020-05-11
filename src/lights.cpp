@@ -91,7 +91,7 @@ int Lights::antipodal_index(int i) {
 
 void Lights::pulseOneColor() {              //-m10-PULSE BRIGHTNESS ON ALL LEDS TO ONE COLOR
     static bool bouncedirection;
-    static int ibright;
+    static uint8_t ibright;
 
     if (safeDelay(speed_)) 
         return;
@@ -108,19 +108,22 @@ void Lights::pulseOneColor() {              //-m10-PULSE BRIGHTNESS ON ALL LEDS 
             bouncedirection = 0;
         }
     }
-    for (int idex = 0 ; idex < num_leds_; idex++) {
-        leds_.setPixelColor(idex, leds_.ColorHSV(color_, 255, ibright));
-    }
+
+    leds_.fill(leds_.ColorHSV(color_, 255, ibright), 0, num_leds_);
     leds_.show();
 }
 
 void Lights::rgbProp() { //-m27-RGB PROPELLER
-    static int idex;
+    static uint8_t idex;
 
     if (safeDelay(speed_))
         return;
 
     idex++;
+
+    if (idex > 255)
+        idex = 0;
+
     uint16_t ghue = (color_ + (int)(65536 / 3)) % 65536;
     uint16_t bhue = (color_ + (int)(65536 / 2)) % 65536;
     int N3  = int(num_leds_ / 3);
@@ -138,7 +141,7 @@ void Lights::rgbProp() { //-m27-RGB PROPELLER
 }
 
 void Lights::rainbow() {
-    static uint16_t ihue = 0;
+    static uint32_t ihue = 0;
 
     if (safeDelay(speed_))
         return;
@@ -156,7 +159,7 @@ void Lights::rainbow() {
 
 void Lights::randomColor() { //-m25-RANDOM COLOR POP
     static int idex;
-    static uint16_t ihue;
+    static uint32_t ihue;
 
     if (safeDelay(speed_))
         return;
@@ -170,30 +173,32 @@ void Lights::randomColor() { //-m25-RANDOM COLOR POP
 }
 
 void Lights::adaptTemp() {
-    // static uint8_t old_cpu_temp;
-    // static uint8_t old_gpu_temp;
+    static uint32_t old_cpu_temp;
+    static uint32_t old_gpu_temp;
 
-    // if (safeDelay(speed_))
-    //     return;
+    if (safeDelay(speed_))
+        return;
 
     
-    // if (cpu_temp_ >= gpu_temp_) {
-    //     if (old_cpu_temp != cpu_temp_) {
-    //         if (old_cpu_temp < cpu_temp_)
-    //             old_cpu_temp++;
-    //         else if (old_cpu_temp > cpu_temp_)
-    //             old_cpu_temp--;
-    //         oneColor(leds_.ColorHSV(map(old_cpu_temp, 30, 80, 0, 65536), 255, 255));
-    //     }
-    // }
-    // else {
-    //     if (old_gpu_temp != gpu_temp_){
-    //         if (old_gpu_temp < gpu_temp_)
-    //             old_gpu_temp++;
-    //         else if (old_gpu_temp > gpu_temp_)
-    //             old_gpu_temp--;
-    //         oneColor(leds_.ColorHSV(map(old_gpu_temp, 30, 80, 0, 65536), 255, 255));
-    //     }
-    // }
+    if (cpu_temp_ >= gpu_temp_) {
+        if (old_cpu_temp != cpu_temp_) {
+            if (old_cpu_temp < cpu_temp_)
+                old_cpu_temp++;
+            else if (old_cpu_temp > cpu_temp_)
+                old_cpu_temp--;
+            leds_.fill(leds_.ColorHSV(map(old_cpu_temp, 30, 90, 65536 / 6, 65536), 255, 255), 0, num_leds_);
+            leds_.show();
+        }
+    }
+    else {
+        if (old_gpu_temp != gpu_temp_){
+            if (old_gpu_temp < gpu_temp_)
+                old_gpu_temp++;
+            else if (old_gpu_temp > gpu_temp_)
+                old_gpu_temp--;
+            leds_.fill(leds_.ColorHSV(map(old_gpu_temp, 30, 80, 65536 / 6, 65536), 255, 255), 0, num_leds_);
+            leds_.show();
+        }
+    }
 }
 
