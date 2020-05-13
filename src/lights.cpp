@@ -197,12 +197,11 @@ void Lights::randomColor() { //-m25-RANDOM COLOR POP
 }
 
 void Lights::adaptTemp(uint8_t cpu_temp, uint8_t gpu_temp) {
-    uint32_t new_cpu_temp = cpu_temp * 655.36;
-    uint32_t new_gpu_temp = gpu_temp * 819.2;
-    
-    static uint32_t old_cpu_temp;
-    static uint32_t old_gpu_temp;
+    static uint32_t old_cpu_temp = 0;
+    static uint32_t old_gpu_temp = 0;
 
+    uint32_t new_cpu_temp = cpu_temp * 65536 / 90;
+    uint32_t new_gpu_temp = gpu_temp * 65536 / 80;
 
 
     if (safeDelay(speed_))
@@ -212,9 +211,9 @@ void Lights::adaptTemp(uint8_t cpu_temp, uint8_t gpu_temp) {
     if (new_cpu_temp >= new_gpu_temp) {
         if (old_cpu_temp != new_cpu_temp) {
             if (old_cpu_temp < new_cpu_temp)
-                old_cpu_temp++;
+                old_cpu_temp+=100;
             else if (old_cpu_temp > new_cpu_temp)
-                old_cpu_temp--;
+                old_cpu_temp-=100;
             leds_.fill(leds_.ColorHSV(old_cpu_temp, 255, 255), 0, num_leds_);
             leds_.show();
         }
@@ -222,9 +221,9 @@ void Lights::adaptTemp(uint8_t cpu_temp, uint8_t gpu_temp) {
     else {
         if (old_gpu_temp != new_gpu_temp){
             if (old_gpu_temp < new_gpu_temp)
-                old_gpu_temp++;
+                old_gpu_temp+=100;
             else if (old_gpu_temp > new_gpu_temp)
-                old_gpu_temp--;
+                old_gpu_temp-=100;
             leds_.fill(leds_.ColorHSV(old_gpu_temp, 255, 255), 0, num_leds_);
             leds_.show();
         }

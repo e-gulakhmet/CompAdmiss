@@ -69,10 +69,10 @@ void loop() {
   fan.update(info.info.cpu_temp, info.info.gpu_temp);
 
 
-  if (millis() - timer_info > 500) {
+  if (millis() - timer_info > 1000) {
     parse(&info);
-    if (info.info.cpu_temp <= 100) {
-      if (is_connect) {
+    if (is_connect) {
+      if (info.info.cpu_temp <= 100 && info.info.cpu_temp >= 20){
         fan.setMode(static_cast<Fan::FanMode>(info.info.fan_mode));
         fan.setStepTemp(info.info.fan_cpu_step_temp, info.info.fan_gpu_step_temp);
         leds.setOn(info.info.lights_main_mode);
@@ -81,10 +81,10 @@ void loop() {
         leds.setEffectSpeed(info.info.lights_speed);
         leds.setEffectColor(info.info.light_color);
       }
-      else {
-        fan.setMode(Fan::fmOn);
-        leds.setEffect(Lights::emRgbPropeller);
-      }
+    }
+    else {
+      fan.setMode(Fan::fmOn);
+      leds.setEffect(Lights::emRgbPropeller);
     }
     timer_info = millis();
   }
