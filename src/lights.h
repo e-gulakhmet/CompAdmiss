@@ -27,7 +27,13 @@ class Lights {
             emRandomColor,
             emPulseOneColor,
             emRgbPropeller,
-            emRainbow
+            emRainbow,
+            emFlicker,
+            emRandomRed,
+            emRadiation,
+            emWhiteTemps,
+            emQuaqBright,
+            emSparkle
         } EffectMode;
         
         void begin(); // Инициализация
@@ -37,11 +43,6 @@ class Lights {
         void setBrightness(uint8_t bright) {leds_.setBrightness(bright);}; // Установка яркости
         void setEffectSpeed(int speed) {speed_ = speed;}; // Установка скорости эффектов
         void setEffectColor(uint16_t color) {color_index_ = color;};
-        void pulseOneColor();
-        void rgbProp();
-        void rainbow();
-        void randomColor();
-        void adaptTemp();
 
     private:
         uint8_t data_pin_;
@@ -73,6 +74,18 @@ class Lights {
 
         EffectMode mode_;
         Adafruit_NeoPixel leds_;
+
+        void pulseOneColor();
+        void rgbProp();
+        void rainbow();
+        void randomColor();
+        void adaptTemp(uint8_t cpu_temp, uint8_t gpu_temp);
+        void flicker();
+        void randomRed();
+        void radiation();
+        void whiteTemps();
+        void quaqBright();
+        void sparkle();
 
         bool safeDelay(int del_time);
         int antipodal_index(int i);

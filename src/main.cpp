@@ -11,7 +11,10 @@ PCInfo info;
 
 bool is_connect = false;
 unsigned long timer_info;
-char inData[82]; // массив входных значений (СИМВОЛЫ)
+char inData[100]; // массив входных значений (СИМВОЛЫ)
+
+
+// TODO:Закончить описание проекта
 
 
 
@@ -66,21 +69,23 @@ void loop() {
   fan.update(info.info.cpu_temp, info.info.gpu_temp);
 
 
-  if (millis() - timer_info > 2000) {
+  if (millis() - timer_info > 500) {
     parse(&info);
+    if (info.info.cpu_temp <= 100) {
+      if (is_connect) {
+        fan.setMode(static_cast<Fan::FanMode>(info.info.fan_mode));
+        fan.setStepTemp(info.info.fan_cpu_step_temp, info.info.fan_gpu_step_temp);
+        leds.setOn(info.info.lights_main_mode);
+        leds.setEffect(static_cast<Lights::EffectMode>(info.info.lights_mode));
+        leds.setBrightness(info.info.lights_bright);
+        leds.setEffectSpeed(info.info.lights_speed);
+        leds.setEffectColor(info.info.light_color);
+      }
+      else {
+        fan.setMode(Fan::fmOn);
+        leds.setEffect(Lights::emRgbPropeller);
+      }
+    }
     timer_info = millis();
-    if (is_connect) {
-      fan.setMode(static_cast<Fan::FanMode>(info.info.fan_mode));
-      fan.setStepTemp(info.info.fan_cpu_step_temp, info.info.fan_gpu_step_temp);
-      leds.setOn(info.info.lights_main_mode);
-      leds.setEffect(static_cast<Lights::EffectMode>(info.info.lights_mode));
-      leds.setBrightness(info.info.lights_bright);
-      leds.setEffectSpeed(info.info.lights_speed);
-      leds.setEffectColor(info.info.light_color);
-    }
-    else {
-      fan.setMode(Fan::fmOn);
-      leds.setEffect(Lights::emRgbPropeller);
-    }
   }
 }
