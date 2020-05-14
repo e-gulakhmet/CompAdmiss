@@ -42,7 +42,8 @@ class Lights {
         void setEffect(EffectMode mode) {mode_ = mode;}; // Установка режима подсветки
         void setBrightness(uint8_t bright) {leds_.setBrightness(bright);}; // Установка яркости
         void setEffectSpeed(int speed) {speed_ = speed;}; // Установка скорости эффектов
-        void setEffectColor(uint16_t color) {color_index_ = color;};
+        void setEffectColor(uint32_t color) {color_ = color;};
+        void setMaxTemp(uint8_t max_cpu_temp, uint8_t max_gpu_temp);
 
     private:
         uint8_t data_pin_;
@@ -50,6 +51,8 @@ class Lights {
 
         uint8_t cpu_temp_;
         uint8_t gpu_temp_;
+        uint8_t max_cpu_temp_;
+        uint8_t max_gpu_temp_;
 
         bool is_on_;
         int speed_;

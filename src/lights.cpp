@@ -5,6 +5,10 @@
 Lights::Lights(uint8_t data_pin, uint8_t num_leds)
     : data_pin_(data_pin)
     , num_leds_(num_leds)
+    , cpu_temp_(0)
+    , gpu_temp_(0)
+    , max_cpu_temp_(90)
+    , max_gpu_temp_(80)
     , is_on_(true)
     , speed_(30)
     , color_(30000)
@@ -94,6 +98,12 @@ void Lights::update(uint8_t cpu_temp, uint8_t gpu_temp) {
     }
 }
 
+
+void Lights::setMaxTemp(uint8_t max_cpu_temp, uint8_t max_gpu_temp) {
+    max_cpu_temp_ = max_cpu_temp;
+    max_gpu_temp_ = max_gpu_temp;
+}
+
 bool Lights::safeDelay(int del_time) {
     static unsigned long timer;
     if (millis() - timer < del_time)
@@ -133,7 +143,7 @@ void Lights::pulseOneColor() {              //-m10-PULSE BRIGHTNESS ON ALL LEDS 
         }
     }
 
-    leds_.fill(color_pallete_[color_index_], 0, num_leds_);
+    leds_.fill(leds_.ColorHSV(color_, 255, ibright), 0, num_leds_);
     leds_.show();
 }
 
@@ -200,8 +210,8 @@ void Lights::adaptTemp(uint8_t cpu_temp, uint8_t gpu_temp) {
     static uint32_t old_cpu_temp = 0;
     static uint32_t old_gpu_temp = 0;
 
-    uint32_t new_cpu_temp = cpu_temp * 65536 / 90;
-    uint32_t new_gpu_temp = gpu_temp * 65536 / 80;
+    uint32_t new_cpu_temp = cpu_temp * 65536 / max_cpu_temp_;
+    uint32_t new_gpu_temp = gpu_temp * 65536 / max_gpu_temp_;
 
 
     if (safeDelay(speed_))
@@ -248,19 +258,19 @@ void Lights::flicker() {
 }
 
 void Lights::randomRed() {                       //QUICK 'N DIRTY RANDOMIZE TO GET CELL AUTOMATA STARTED
-  int temprand;
-  int red;
-  for (int i = 0; i < num_leds_; i++ ) {
-    temprand = random(0, 100);
-    if (temprand > 50) {
-      red = 255;
+    int temprand;
+    int blue;
+    for (int i = 0; i < num_leds_; i++ ) {
+        temprand = random(0, 100);
+        if (temprand > 50) {
+            blue = 255;
+        }
+        if (temprand <= 50) {
+            blue = 0;
+        }
+        leds_.setPixelColor(i, leds_.Color(0, 0, blue));
     }
-    if (temprand <= 50) {
-      red = 0;
-    }
-    leds_.setPixelColor(i, leds_.Color(red, 0, 0));
-  }
-  leds_.show();
+    leds_.show();
 }
 
 void Lights::radiation() {
@@ -383,7 +393,7 @@ void Lights::quaqBright() {
 
 void Lights::sparkle() {
     uint8_t pixel = random(num_leds_);
-    leds_.setPixelColor(pixel, color_pallete_[color_index_]);
+    leds_.setPixelColor(pixel, leds_.ColorHSV(color_, 255, 255));
     leds_.show();
     if (safeDelay(speed_))
         return;

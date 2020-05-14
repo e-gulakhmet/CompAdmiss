@@ -79,7 +79,8 @@ void loop() {
         leds.setEffect(static_cast<Lights::EffectMode>(info.info.lights_mode));
         leds.setBrightness(info.info.lights_bright);
         leds.setEffectSpeed(info.info.lights_speed);
-        leds.setEffectColor(info.info.light_color);
+        leds.setEffectColor(info.info.light_color * 257);
+        leds.setMaxTemp(info.info.light_cpu_max_temp, info.info.light_gpu_max_temp);
       }
     }
     else {
