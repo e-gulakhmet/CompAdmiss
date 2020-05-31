@@ -1,0 +1,70 @@
+/*--------- General ---------*/
+@font-face {
+    font-family: 'OpenSans';
+    src: url('https://fonts.google.com/specimen/Open+Sans');
+}
+/* QFrame {
+    background-color: #161616;
+    border-radius: 10px;
+} */
+
+
+
+/*-------- main.py ----------*/
+
+/* QWidget#MainWindow {
+    background-color: #000018;
+} */
+
+
+QMenuBar {
+    font: 15px;
+    background-color: #b3b3b3;
+}
+
+QLabel {
+    font: 15px;
+}
+
+QComboBox {
+    font: 15px;
+}
+
+QTextEdit {
+    font: 15px;
+}
+
+
+/*------- settingmenu.py -------*/
+/* QLabel#SettMenuLabel {
+    font-family: 'OpenSans';
+    font: bold 25px;
+    color: white;
+}
+
+QTextEdit#SettMenuTextEdit {
+    font-family: 'OpenSans';
+    padding-top: 5px;
+    font: bold 25px;
+    color: #733ae6;
+    border: 2px solid #3700b3;
+    border-radius: 5px;
+}
+
+QPushButton#SettMenuUpdButt {
+    background-image: url(images/update_port.png) no-repeat;
+    border: 2px solid #733ae6;
+    border-radius: 15px;
+}
+QPushButton#SettMenuUpdButt:hover {
+    background-color: #733ae6;
+}
+
+QPushButton#SettMenuSaveButt {
+    background: url(images/save_config.png) no-repeat;
+    border: 2px solid #733ae6;
+    border-radius: 25px;
+}
+QPushButton#SettMenuSaveButt:hover {
+    background-color: #733ae6;
+} */
