@@ -12,6 +12,7 @@ const uint8_t FAN_PIN_2 = 6;  // Пин вентилятора
 const uint8_t BRIGHT = 100; // Стандартная яркость
 
 typedef struct {
+  uint8_t rand_value;
   uint8_t cpu_temp;
   uint8_t gpu_temp;
   uint8_t fan_mode;

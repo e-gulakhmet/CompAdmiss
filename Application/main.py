@@ -1,5 +1,6 @@
 import sys
 import datetime
+import random
 from PyQt5.QtWidgets import QApplication, QVBoxLayout, QWidget, QMenuBar, QAction
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QIcon
@@ -13,9 +14,10 @@ import configurator
 import tray
 
 
-# TODO: Открытие приложения при двойном нажатии в трее
-# TODO: Добавить рамку вокруг основных настроек подсветки
+
+# TODO: Добавить разные пути к файлам под разные платформы
 # TODO: Закончить описание проекта
+
 
 
 class MainWindow(QWidget) :
@@ -198,7 +200,8 @@ class MainWindow(QWidget) :
         #             print("invalid data from controller [", e, ']')
 
         # Получаем данные от подсветки и вентилятора
-        data = self.dp.get_data()
+        data = str(random.randint(0, 255))
+        data += self.dp.get_data()
         data += self.fm.get_data()
         data += self.lm.get_data()
         self.ds.send(data)

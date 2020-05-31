@@ -12,9 +12,14 @@ PCInfo info;
 bool is_connect = false;
 unsigned long timer_info;
 char inData[100]; // массив входных значений (СИМВОЛЫ)
+uint8_t rand_val_limit;
+uint8_t rand_val;
 
 
-// TODO:Закончить описание проекта
+
+
+// TODO: Закончить описание проекта
+// TODO: Добавить отключения модуля если данные не приходят
 
 
 
@@ -81,6 +86,17 @@ void loop() {
         leds.setEffectSpeed(info.info.lights_speed);
         leds.setEffectColor(info.info.light_color * 257);
         leds.setMaxTemp(info.info.light_cpu_max_temp, info.info.light_gpu_max_temp);
+
+        rand_val_limit++;
+        
+        if (rand_val != info.info.rand_value) {
+          rand_val = info.info.rand_value;
+          rand_val_limit = 0;
+        }
+        // Если поступили значения, но они не поменялись
+        else if (rand_val_limit > 3)
+          // Говорим, что мы отключились
+          is_connect = false;
       }
     }
     else {
