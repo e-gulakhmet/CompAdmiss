@@ -28,7 +28,7 @@ class MainWindow(QWidget) :
 
     def __init__(self) :
         super().__init__()
-
+        
         self.now = datetime.datetime.now()
 
         # Задаем имя главному меню, чтобы потом использовать его в css файле
@@ -50,7 +50,7 @@ class MainWindow(QWidget) :
 
 
         # Инициализируем класс сохраняющий конфигурцию приложения
-        self.config = configurator.Configurator('config.ini')
+        self.config = configurator.Configurator("config.ini")
 
 
         # Инициализируем класса отвечающий за выdод информации о температурах
@@ -58,9 +58,9 @@ class MainWindow(QWidget) :
 
 
         # Инициализируем класс отвечающий за настройку подсветки
-        self.lm = lightsmenu.LightsMenu(self.config.config_data['LIGHT']['main_mode'],
-                                        self.config.config_data['LIGHT']['mode'],
-                                        self.config.config_data['LIGHT']['brightness'],
+        self.lm = lightsmenu.LightsMenu(self.config.config_data["LIGHT"]["main_mode"],
+                                        self.config.config_data["LIGHT"]["mode"],
+                                        self.config.config_data["LIGHT"]["brightness"],
                                         self.config.config_data["LIGHT"]["speed"],
                                         self.config.config_data["LIGHT"]["max_cpu_temp"],
                                         self.config.config_data["LIGHT"]["max_gpu_temp"],
@@ -228,7 +228,7 @@ def main() :
     mw = MainWindow()
     
     # Открываем и установливаем файл css для приложения
-    with open("./style.css") as f :
+    with open("/home/whoman/wrk/development/arduino/CompAdmiss/Application/style.css") as f :
         qApp.setStyleSheet(f.read())
 
     sys.exit(qApp.exec_())

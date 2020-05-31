@@ -1,16 +1,17 @@
 import configparser
+import os
 
 
 class Configurator() :
 
     def __init__(self, file) :
         self.file_ = file
-
         self.config_data = configparser.ConfigParser()
-        self.config_data.read(self.file_)
+        print(os.path.join(os.path.abspath(os.getcwd()), "config.ini"))
+        self.config_data.read("/home/whoman/wrk/development/arduino/CompAdmiss/Application/config.ini")
 
     def save(self):
-        with open("config.ini", 'w') as configfile:
+        with open("/home/whoman/wrk/development/arduino/CompAdmiss/Application/config.ini", 'w') as configfile:
             self.config_data.write(configfile)
         print("saved")
 
