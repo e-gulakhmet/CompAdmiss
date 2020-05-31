@@ -12,7 +12,7 @@ class TrayCofiguration(QSystemTrayIcon):
         super().__init__()
 
         # Иконка для треея
-        self.setIcon(QIcon("./images/icon3.png"))
+        self.setIcon(QIcon("/home/whoman/wrk/development/arduino/CompAdmiss/Application/images/icon3.png"))
         self.setToolTip("CompAsmiss")
         self.activated.connect(self.open_widget)
 

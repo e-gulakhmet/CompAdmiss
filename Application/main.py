@@ -36,7 +36,7 @@ class MainWindow(QWidget) :
 
 
         # Устанавливаем иконку приложения
-        self.setWindowIcon(QIcon("./images/icon3.png"))
+        self.setWindowIcon(QIcon("/home/whoman/wrk/development/arduino/CompAdmiss/Application/images/icon3.png"))
         # Устанавливаем размеры и расположение окна приложения
         self.setGeometry(200, 200, 400, 300)
         # Создание строки которое пишется в рамке приложения
