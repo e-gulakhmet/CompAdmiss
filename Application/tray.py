@@ -8,11 +8,13 @@ class TrayCofiguration(QSystemTrayIcon):
 
     S_widget_state = pyqtSignal(bool, name='WidgetState')
 
-    def __init__(self):
+    def __init__(self, file):
         super().__init__()
+        
+        self.file_ = file
 
         # Иконка для треея
-        self.setIcon(QIcon("/home/whoman/wrk/development/arduino/CompAdmiss/Application/images/icon3.png"))
+        self.setIcon(QIcon(self.file_))
         self.setToolTip("CompAsmiss")
         self.activated.connect(self.open_widget)
 

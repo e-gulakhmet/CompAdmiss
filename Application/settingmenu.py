@@ -37,7 +37,7 @@ class SettingMenu(QFrame):
         configSaveButt.setObjectName("SettMenuSaveButt")
         configSaveButt.clicked.connect(self.set_port_info)
 
-        updateButt = QPushButton(QIcon("./images/updating.png"), "Update")   
+        updateButt = QPushButton("Update")   
         updateButt.clicked.connect(self.act_update_ports)    
 
 
