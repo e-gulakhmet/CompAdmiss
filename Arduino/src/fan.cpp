@@ -5,9 +5,11 @@
 Fan::Fan(uint8_t fan_pin)
     : fan_pin_(fan_pin)
     , fan_speed_(0)
+    , cpu_temp_(0)
+    , gpu_temp_(0)
     , cpu_step_temp_(60)
     , gpu_step_temp_(55)
-    , fan_mode_(fmAuto)
+    , fan_mode_(fmOff)
     {
         pinMode(fan_pin_, OUTPUT);
     }
@@ -26,30 +28,20 @@ void Fan::update(uint8_t cpu_temp, uint8_t gpu_temp) {
             fan_speed_ = 255; 
             break;
 
-        case fmAuto:
-            // Проверяем поступают ли данные о температуре
-            // Если температура равна 0, то выключаем флаг is_online_
-            if (cpu_temp_ == 0 && gpu_temp_ == 0) {
-                // Если флаг не включен, то включаем вентиляторы
-                fan_speed_ = 255;
-                break;
-            }
-
-            // Если температура не равно 0, то измеряем температуру       
-            if (millis() - fan_timer_ > 2000) { // Измеряем температуру, каждые 2 секунд.
-                fan_timer_ = millis();
-                // Выбираем режим
-                if (cpu_temp_ > cpu_step_temp_ || gpu_temp_ > gpu_step_temp_) {
-                    fan_speed_ = 255;
-                }
-                else if (cpu_temp_ < cpu_step_temp_ + 1 || gpu_temp_ < gpu_step_temp_ + 1) {
-                    fan_speed_ = 0;
+        case fmAuto:    
+            if (cpu_temp_ != 0 && gpu_temp_ != 0) {
+                if (millis() - fan_timer_ > 500) { // Измеряем температуру, каждые 2 секунд.
+                    fan_timer_ = millis();
+                    // Выбираем режим
+                    if (cpu_temp_ > cpu_step_temp_ || gpu_temp_ > gpu_step_temp_)
+                        fan_speed_ = 255;
+                    else
+                        fan_speed_ = 0;
                 }
             }
             break;
-        }
+    }
 
-    // Присваем дэфолтные значения выбранного режима, скорости вентилятора(fan_speed_)
     analogWrite(fan_pin_, fan_speed_);
 }
 
@@ -82,23 +74,4 @@ String Fan::getModeName() {
 void Fan::setStepTemp(uint8_t cpu_step_temp, uint8_t gpu_step_temp) {
     cpu_step_temp_ = cpu_step_temp;
     gpu_step_temp_ = gpu_step_temp;
-}
-
-
-void Fan::nextMode() {
-    switch(fan_mode_) {
-        case fmOff: fan_mode_ = fmOn; break;
-        case fmOn: fan_mode_ = fmAuto; break;
-        case fmAuto: break;
-    }
-}
-
-
-
-void Fan::prevMode() {
-    switch(fan_mode_) {
-        case fmOff: break;
-        case fmOn: fan_mode_ = fmOff; break;
-        case fmAuto: fan_mode_ = fmOn; break;
-    }
 }

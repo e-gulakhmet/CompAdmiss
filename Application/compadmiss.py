@@ -208,7 +208,7 @@ class MainWindow(QWidget) :
         #             print("invalid data from controller [", e, ']')
 
         # Получаем данные от подсветки и вентилятора
-        data = str(random.randint(0, 255))
+        data = str(random.randint(0, 255)) + ';'
         data += self.dp.get_data()
         data += self.fm.get_data()
         data += self.lm.get_data()

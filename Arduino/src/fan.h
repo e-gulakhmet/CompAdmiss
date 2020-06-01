@@ -26,8 +26,6 @@ class Fan {
         void autoMode();
         void off();
         void setMode(FanMode mode) {fan_mode_ = mode;};
-        void nextMode();
-        void prevMode();
         String getModeName();
         void setStepTemp(uint8_t cpu_temp, uint8_t gpu_temp);
         int getSpeed() {return fan_speed_;}

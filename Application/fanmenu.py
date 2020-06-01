@@ -155,7 +155,7 @@ class FanMenu(QFrame) :
     
     
     def get_data(self):
-        data = str(self.info['mode']) + ";"
-        data += str(self.info["step_cpu_temp"]) + ";"
-        data += str(self.info["step_gpu_temp"]) + ";"
+        data = str(self.info["mode"]) + ';'
+        data += str(self.info["step_cpu_temp"]) + ';'
+        data += str(self.info["step_gpu_temp"]) + ';'
         return data

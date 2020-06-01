@@ -29,7 +29,7 @@ typedef struct {
 
 typedef union {
   OHMInfo info;
-  byte data[14];
+  byte data[20];
 } PCInfo;
 
 

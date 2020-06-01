@@ -22,8 +22,7 @@ class DataPresenter(QWidget) :
     # Класс предсталяющий данные по температуре
     def __init__(self) :
         super().__init__()  # Даем команду, чтобы все подключаемые библиотеки прогрузились
-        self.sensor_info = {'CPU_Temperature': 0, 'GPU_Temperature': 0} # Содержит значения температур
-        self.changed = True
+        self.sensor_info = {"CPU_Temperature": 0, "GPU_Temperature": 0} # Содержит значения температур
 
         # Позволяем виджету изменять свои размеры при изменении размеров окна
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -81,21 +80,20 @@ class DataPresenter(QWidget) :
         # Создаем таймер, для того чтобы температура 
         # измерялась только раз в секунду
         timer = QTimer(self)
-        timer.setInterval(5000)
+        timer.setInterval(2000)
         timer.setSingleShot(False)
         timer.timeout.connect(self.sensList.update)  # Обновляем данные по температуре
-        timer.start(5000)
+        timer.start(2000)
 
 
-    def updateInfo(self, sensor_type, value) :
+    def updateInfo(self, sensor_name, value) :
         # Обновляем значения
-        self.changed = (self.sensor_info[sensor_type] != value)
-        self.sensor_info[sensor_type] = value
+        self.sensor_info[sensor_name] = value
         self.cpuTempLabel.setText(str(self.sensor_info[self.cpuTemp.name]))
         self.gpuTempLabel.setText(str(self.sensor_info[self.gpuTemp.name]))
 
     
     def get_data(self):
-        data = str(self.sensor_info[self.cpuTemp.name]) + ";"
-        data += str(self.sensor_info[self.gpuTemp.name]) + ";"
+        data = str(self.sensor_info[self.cpuTemp.name]) + ';'
+        data += str(self.sensor_info[self.gpuTemp.name]) + ';'
         return data    
